@@ -1,0 +1,22 @@
+function D = events2samples(initial, events)
+% D - an n x t_max matrix
+
+n = numel(initial);
+D = zeros(n,sum(events(:,1)));
+
+x = initial(:);
+t = 0;
+
+for event = events'
+    delta_t = event(1);
+    if event(2) == 0
+        t = t + 1;
+        D(:,t:t+delta_t-1) = x(:,ones(1,delta_t));
+    else
+        if delta_t > 0
+            D(:,t+1:t+delta_t) = x(:,ones(1,delta_t));
+            t = t + delta_t;
+        end
+        x(event(2)) = event(3);    
+    end
+end
