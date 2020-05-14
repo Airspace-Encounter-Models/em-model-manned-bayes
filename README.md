@@ -18,6 +18,7 @@ Each manned aircraft model model is a Bayesian Network, a representation of a mu
     - [Due Regard Model](#due-regard-model)
     - [Helicopter Air Ambulance](#helicopter-air-ambulance)
     - [Littoral Model](#littoral-model)
+  - [Citation](#citation)
   - [Distribution Statement](#distribution-statement)
 
 ## Nomenclature
@@ -116,6 +117,14 @@ Filename | Model | Description
 :---  | :---  | :---  
 [littoral_uncor_v1.txt](./model/littoral_uncor_v1.txt) | [littoral](https://github.com/Airspace-Encounter-Models/em-overview/blob/master/README.md#manned-littoral-model) | Uncorrelated conventional (Version 1.0) |
 [littoral_cor_v1.txt](./model/littoral_cor_v1.txt) | [littoral](https://github.com/Airspace-Encounter-Models/em-overview/blob/master/README.md#manned-littoral-model) | Correlated (Version 1.0) |
+
+## Citation
+
+Please use this DOI number reference when citing the software:
+
+<a href="https://doi.org/10.5281/zenodo.3827101"><img src="https://zenodo.org/badge/DOI/10.5281/zenodo.3827101.svg" alt="DOI"></a>
+
+Please use the appropriate documents listed in [`em-overview/README`](https://github.com/Airspace-Encounter-Models/em-overview/blob/master/README.md#documentation) when citing the technical concepts.
 
 ## Distribution Statement
 
