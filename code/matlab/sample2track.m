@@ -14,22 +14,26 @@ addOptional(p,'num_max_tracks',10000,@isnumeric);
 addOptional(p,'out_dir_parent',[getenv('AEM_DIR_BAYES') filesep 'output' filesep 'tracks']);
 
 % Optional - Initial
-% These need to exactly match parameters.labels_initial
+% These need to align with parameters.labels_initial
 % Note that not all models may have these variables / labels
-addOptional(p,'label_initial_geographic','"G"');
-addOptional(p,'label_initial_airspace','"A"');
-addOptional(p,'label_initial_altitude','"L"');
-addOptional(p,'label_initial_speed','"v"');
-addOptional(p,'label_initial_acceleration','"\dot v"');
-addOptional(p,'label_initial_vertrate','"\dot h"');
-addOptional(p,'label_initial_turnrate','"\dot \psi" ');
+% These labels can be calculated via:
+% matlab.lang.makeValidName(erase(parameters.labels_initial,{'"','\'}));
+addOptional(p,'label_initial_geographic','G');
+addOptional(p,'label_initial_airspace','A');
+addOptional(p,'label_initial_altitude','L');
+addOptional(p,'label_initial_speed','v');
+addOptional(p,'label_initial_acceleration','dotV');
+addOptional(p,'label_initial_vertrate','dotH');
+addOptional(p,'label_initial_turnrate','dotPsi');
 
 % Optional - Transition
-% These need to exactly match parameters.labels_transition
+% These need to align with parameters.labels_transition
 % Note that not all models may have these variables / labels
-addOptional(p,'label_transition_speed',"\dot v(t+1)");
-addOptional(p,'label_transition_altitude',"\dot h(t+1)");
-addOptional(p,'label_transition_heading',"\dot \psi(t+1)" );
+% These labels can be calculated via:
+% matlab.lang.makeValidName(erase(parameters.labels_transition(parameters.temporal_map(:,2)),{'"','\'}))
+addOptional(p,'label_transition_speed','dotV_t_1_'); % \dot v(t+1)
+addOptional(p,'label_transition_altitude','dotH_t_1_'); % \dot h(t+1)
+addOptional(p,'label_transition_heading','dotPsi_t_1_' ); % \dot \psi(t+1)
 
 % Optional - Rejection Sampling
 addOptional(p,'min_altitude_ft',0, @isnumeric);
@@ -48,13 +52,16 @@ rng(p.Results.rng_seed);
 % Parameters
 parameters = em_read(parameters_filename);
 
+labels_init = matlab.lang.makeValidName(erase(parameters.labels_initial,{'"','\'}));
+labels_trans = matlab.lang.makeValidName(erase(parameters.labels_transition(parameters.temporal_map(:,2)),{'"','\'}));
+
 % Initial
 T_initial = readtable(initial_filename,'Delimiter',' ','HeaderLines',1,'EndOfLine','\n');
-T_initial.Properties.VariableNames = [{'id'}; parameters.labels_initial];
+T_initial.Properties.VariableNames = [{'id'}; labels_init];
 
 % Transition
 T_transition = readtable(transition_filename,'Delimiter',' ','HeaderLines',1,'EndOfLine','\n');
-T_transition.Properties.VariableNames = [{'id'}; {'t'}; parameters.labels_transition(parameters.temporal_map(:,2))];
+T_transition.Properties.VariableNames = [{'id'}; {'t'}; labels_trans];
 
 %% Filter to desired number tracks
 if size(T_initial,1) > p.Results.num_max_tracks
@@ -64,21 +71,21 @@ num_tracks = size(T_initial,1);
 
 %% Find column indicies
 % Initial
-idx_initial_geographic = find(contains(T_initial.Properties.VariableNames,p.Results.label_initial_geographic));
-idx_initial_airspace = find(contains(T_initial.Properties.VariableNames,p.Results.label_initial_airspace));
-idx_initial_altitude = find(contains(T_initial.Properties.VariableNames,p.Results.label_initial_altitude));
-idx_initial_speed = find(contains(T_initial.Properties.VariableNames,p.Results.label_initial_speed));
-idx_initial_acceleration = find(contains(T_initial.Properties.VariableNames,p.Results.label_initial_acceleration));
-idx_initial_vertrate = find(contains(T_initial.Properties.VariableNames,p.Results.label_initial_vertrate));
+idx_initial_geographic = find(strcmp(T_initial.Properties.VariableNames,p.Results.label_initial_geographic));
+idx_initial_airspace = find(strcmp(T_initial.Properties.VariableNames,p.Results.label_initial_airspace));
+idx_initial_altitude = find(strcmp(T_initial.Properties.VariableNames,p.Results.label_initial_altitude));
+idx_initial_speed = find(strcmp(T_initial.Properties.VariableNames,p.Results.label_initial_speed));
+idx_initial_acceleration = find(strcmp(T_initial.Properties.VariableNames,p.Results.label_initial_acceleration));
+idx_initial_vertrate = find(strcmp(T_initial.Properties.VariableNames,p.Results.label_initial_vertrate));
 
 % Updates / transition
-idx_update_acc = find(contains(T_transition.Properties.VariableNames,p.Results.label_transition_speed));
-idx_update_vertrate = find(contains(T_transition.Properties.VariableNames,p.Results.label_transition_altitude));
-idx_update_turnrate = find(contains(T_transition.Properties.VariableNames,p.Results.label_transition_heading));
+idx_update_acc = find(strcmp(T_transition.Properties.VariableNames,p.Results.label_transition_speed));
+idx_update_vertrate = find(strcmp(T_transition.Properties.VariableNames,p.Results.label_transition_altitude));
+idx_update_turnrate = find(strcmp(T_transition.Properties.VariableNames,p.Results.label_transition_heading));
 
 % Bounds
-idx_bound_alt = find(contains(parameters.labels_initial,p.Results.label_initial_altitude));
-idx_bound_speed = find(contains(parameters.labels_initial,p.Results.label_initial_speed));
+idx_bound_alt = find(strcmp(labels_init,p.Results.label_initial_altitude));
+idx_bound_speed = find(strcmp(labels_init,p.Results.label_initial_speed));
 
 %% For rejection sampling and load balancing
 % Altitude bound
@@ -133,7 +140,7 @@ is_airspace = ~isempty(idx_initial_airspace);
 
 %% Create parent output directories
 % Parent
-mkdir(p.Results.out_dir_parent);
+if exist(p.Results.out_dir_parent,'dir') ~=7; mkdir(p.Results.out_dir_parent);end
 
 % Subdirectories
 if is_unconv
@@ -150,7 +157,8 @@ else
             L = (min_alt:1e2:max_alt+1e2)';
             GAL = combvec(G',A',L')';
             for i=1:1:size(GAL,1)
-                mkdir([p.Results.out_dir_parent filesep sprintf('G%i',GAL(i,1)) filesep sprintf('A%i',GAL(i,2)) filesep sprintf('%ift',GAL(i,3))]);
+                iDir = [p.Results.out_dir_parent filesep sprintf('G%i',GAL(i,1)) filesep sprintf('A%i',GAL(i,2)) filesep sprintf('%ift',GAL(i,3))];
+                if exist(iDir,'dir') ~=7; mkdir(iDir);end
             end
             fprintf('Generated %i directories\n',size(GAL,1));
     end
