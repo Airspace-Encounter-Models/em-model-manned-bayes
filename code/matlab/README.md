@@ -1,5 +1,7 @@
 # MATLAB Code
 
+Code developed and tested in Windows for Matlab R2018a and R2019b. The dev machine had a CPU of Intel Xeon Gold 6130 at 2.10GHz and 64 GB of RAM.
+
 ## Run Scripts
 
 There are two run scripts to streamline and provide example workflows.
