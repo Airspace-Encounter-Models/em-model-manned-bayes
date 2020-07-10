@@ -1,10 +1,10 @@
 %% Inputs
 inDir = [getenv('AEM_DIR_BAYES') filesep 'model'];
-model = 'balloon_v1p2'; % the name of the parameters file
+model = 'uncor_1200code_v2p2'; % the name of the parameters file
 
 outDir = [getenv('AEM_DIR_BAYES') filesep 'output' filesep model filesep date];
 
-num_initial_samples = 500000; % number of samples to generate
+num_initial_samples = 100; % number of samples to generate
 num_transition_samples = 120; % the number of steps to sample from the transition network
 
 % For loading balancing, don't write all samples to a single file
@@ -25,7 +25,7 @@ else
 end
 
 %% Make output directory
-mkdir(outDir);
+if exist(outDir,'dir') ~= 7; mkdir(outDir); end
 
 %% Execute
 parfor i=1:1:num_files

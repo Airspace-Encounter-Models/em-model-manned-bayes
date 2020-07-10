@@ -30,7 +30,7 @@ addOptional(p,'rng_seed',42,@isnumeric); % Random seed
 parse(p,parameters_filename,varargin{:});
 
 %% Set random seed
-rng(p.Results.rng_seed);
+rng(p.Results.rng_seed,'twister');
 
 %% Read and create priors
 % read parameters

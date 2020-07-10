@@ -12,12 +12,14 @@ function [initial, events] = dbn_sample(G_initial, G_transition, temporal_map, r
 %
 % OUTPUT:
 % initial
-% events - matrix of (t, variable_index, new_value) (NOTE: t is the time 
+% events - matrix of (t, variable_index, new_value) (NOTE: t is the time
 % since the last event)
 
 %% Create initial sample if it is not provided as input
-if nargin < 10  
+if nargin < 10
     initial = bn_sample(G_initial, r, N_initial, dirichlet_initial, 1);
+else
+    initial = bn_sample(G_initial, r, N_initial, dirichlet_initial, 1, initial);
 end
 
 %%
@@ -54,8 +56,8 @@ for t = 2:t_max
         for i = 1:n_initial
             if x(i) ~= x_old(i)
                 events = [events; delta_t i x(i)];
-                delta_t = 0;            
+                delta_t = 0;
             end
         end
-    end    
+    end
 end

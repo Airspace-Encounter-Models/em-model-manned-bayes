@@ -1,4 +1,10 @@
 function events = resample_events(initial, events, rates)
+% RESAMPLE_EVENTS generates additional events within a sampled bin
+% according to the desired resample rates. This mitigates the excessive
+% variability in the vertical rates, turn rates, and acceleration that
+% would occur if the values were sampled within each bin at each time step.
+% Variables that do not change during the course of the trajectory have a
+% resample rate of 0.
 
 n = size(events,1);
 

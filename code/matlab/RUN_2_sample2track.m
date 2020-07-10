@@ -1,9 +1,9 @@
 %% Inputs
 % Input from RUN_1_emsample
 % Also used here
-model = 'uncor_v1p2';
-d = '04-Mar-2020'; % date
-num_files = 600;
+model = 'uncor_1200code_v2p2';
+d = '23-Jun-2020'; % date
+num_files = 1;
 parameters_filename = [getenv('AEM_DIR_BAYES') filesep 'model' filesep model '.txt'];
 
 % Output from RUN_1_emsample
@@ -15,8 +15,14 @@ transition_base =  [inDir filesep model '_transition'];
 n_tracks = zeros(num_files,1);
 run_time_s = zeros(num_files,1);
 
+%% Warn about Matlab toolbox
+product_info = ver;
+if ~any(strcmpi({product_info.Name},'Deep Learning Toolbox')) && ~any(strcmpi({product_info.Name},'Neural Network Toolbox'))
+    warning('sample2track() uses combvec(), a function from the MATLAB Deep Learning or Neural Network Toolbox\n');
+end
+
 %% Iterate and Execute
-parfor i=1:1:num_files
+for i=1:1:num_files
     tic;
     % Create filenames and directories
     initial_filename = [initial_base '_' num2str(i) '.txt'];
