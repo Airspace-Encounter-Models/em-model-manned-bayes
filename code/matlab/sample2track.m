@@ -46,7 +46,7 @@ addOptional(p,'isPlot',false,@islogical);
 parse(p,parameters_filename,initial_filename,transition_filename,varargin{:});
 
 %% Set random seed
-rng(p.Results.rng_seed);
+rng(p.Results.rng_seed,'twister');
 
 %% Load files
 % Parameters
@@ -103,20 +103,17 @@ pfn = strsplit(parameters_filename,filesep);
 is_unconv = any(strcmp(strrep(pfn{end},'.txt',''),{'balloon_v1p2','blimp_v1','fai1_v1','fai5_v1','glider_v1p2','paraglider_v1p2','paramotor_v1','skydiving_v1','weatherballoon_v1'}));
 
 %% The position output is in feet, so we need to determine the appropriate unit conversions
-if is_unconv
-    % https://www.ll.mit.edu/sites/default/files/publication/doc/2018-12/Edwards_2009_ATC-348_WW-18098.pdf
+if strfind(pfn{end},'uncor_') || is_unconv
+    % Uncorrelated and unconventional models
+    % % https://www.ll.mit.edu/sites/default/files/publication/doc/2018-12/Edwards_2009_ATC-348_WW-18098.pdf
     ur_speed = unitsratio('ft','nm') / 3600; % Knots to feet per second
     ur_vertrate = unitsratio('ft','ft') / 60; % Feet per minute to feet per second
     ur_heading = 1; % Degrees per second to degrees per second
-    dt_s = 1; % Sampled timestep of model
 else
-    switch strrep(pfn{end},'.txt','')
-        case 'uncor_v2p2'
-            ur_speed = unitsratio('ft','nm') / 3600; % Knots to feet per second
-            ur_vertrate = unitsratio('ft','ft') / 60; % Feet per minute to feet per second
-            ur_heading = 1; % Degrees per second to degrees per second
-            dt_s = 1; % Sampled timestep of model
-    end
+    warning('sample2track:model','%s has not been tested with these function, assigning default units\n',pfn{end});
+    ur_speed = unitsratio('ft','nm') / 3600; % Knots to feet per second
+    ur_vertrate = unitsratio('ft','ft') / 60; % Feet per minute to feet per second
+    ur_heading = 1; % Degrees per second to degrees per second
 end
 
 %% Apply unit conversions
@@ -142,25 +139,32 @@ is_airspace = ~isempty(idx_initial_airspace);
 % Parent
 if exist(p.Results.out_dir_parent,'dir') ~=7; mkdir(p.Results.out_dir_parent);end
 
+% Determine altitude range with a step size of 100
+if mod(min_alt,1e2)~= 0
+    L = (floor(min_alt-50):1e2:max_alt+2e2)';
+else
+    L = (min_alt:1e2:max_alt+2e2)';
+end
+if L(1) < 0; L(1) = 0; end
+
 % Subdirectories
 if is_unconv
-    L = (min_alt:1e2:max_alt+1e2)';
     for i=1:1:size(L,1)
         mkdir([p.Results.out_dir_parent filesep sprintf('%ift',L(i,1))]);
     end
     fprintf('Generated %i directories\n',size(L,1));
 else
-    switch strrep(pfn{end},'.txt','')
-        case 'uncor_v2p2'
-            G = unique(T_initial.(idx_initial_geographic));
-            A = unique(T_initial.(idx_initial_airspace));
-            L = (min_alt:1e2:max_alt+1e2)';
-            GAL = combvec(G',A',L')';
-            for i=1:1:size(GAL,1)
-                iDir = [p.Results.out_dir_parent filesep sprintf('G%i',GAL(i,1)) filesep sprintf('A%i',GAL(i,2)) filesep sprintf('%ift',GAL(i,3))];
-                if exist(iDir,'dir') ~=7; mkdir(iDir);end
-            end
-            fprintf('Generated %i directories\n',size(GAL,1));
+    if strfind(pfn{end},'uncor_')
+        G = unique(T_initial.(idx_initial_geographic));
+        A = unique(T_initial.(idx_initial_airspace));
+        GAL = combvec(G',A',L')';
+        for i=1:1:size(GAL,1)
+            iDir = [p.Results.out_dir_parent filesep sprintf('G%i',GAL(i,1)) filesep sprintf('A%i',GAL(i,2)) filesep sprintf('%ift',GAL(i,3))];
+            if exist(iDir,'dir') ~=7; mkdir(iDir);end
+        end
+        fprintf('Generated %i directories\n',size(GAL,1));
+    else
+        error('sample2track:model','%s has not been tested with these function...wont create output directories\n',pfn{end});
     end
 end
 
@@ -214,7 +218,7 @@ for i=1:1:num_tracks
     
     % Determine if track hits the ground
     is_cfit = false;
-    if any(z_ft < 0); is_cfit = true; end;
+    if any(z_ft < 0); is_cfit = true; end
     
     % Rejection Sampling - Speed
     is_reject_speed = any(speed_fps <= min_speed | speed_fps >= max_speed);
@@ -240,22 +244,7 @@ for i=1:1:num_tracks
         end
         
         % Subdirectory for initial altitude, always use
-        if z_ft(1) >= 10000
-            out_dir_alt =  round(z_ft(1),3,'significant');
-        else
-            if z_ft(1) >= 1000
-                out_dir_alt =  round(z_ft(1),2,'significant');
-            else
-                out_dir_alt =  round(z_ft(1),1,'significant');
-            end
-            if z_ft(1) < 100
-                if z_ft(1) >= 50
-                    out_dir_alt = 100;
-                else
-                    out_dir_alt = 0;
-                end
-            end
-        end
+        out_dir_alt = L(discretize(z_ft(1),L));
         if isempty(out_dir_child)
             out_dir_child = sprintf('%ift',out_dir_alt);
         else

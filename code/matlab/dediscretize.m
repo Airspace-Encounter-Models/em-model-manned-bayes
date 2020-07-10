@@ -1,4 +1,6 @@
 function x = dediscretize(d, parameters, zero_bins, wrap)
+% DEDISCRETIZE  Uniformly samples a value within the parameters bin
+% specified in d. Variables that fall within a zero_bin are set to 0.
 
 if isempty(parameters)
     x = d;
@@ -6,7 +8,7 @@ if isempty(parameters)
 end
 
 if nargin < 4
-    wrap = false;
+    wrap = 0;
     if nargin < 3
         zero_bins = [];    
     end
@@ -27,7 +29,11 @@ for i = 1:n
             end
         end
         a = parameters(dd);
-        b = parameters(dd + 1);
+        try
+            b = parameters(dd + 1);
+        catch
+            pause;
+        end
         x(i) = a + (b - a) * rand;        
     end
 end    
