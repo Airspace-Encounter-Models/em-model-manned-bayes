@@ -103,7 +103,7 @@ pfn = strsplit(parameters_filename,filesep);
 is_unconv = any(strcmp(strrep(pfn{end},'.txt',''),{'balloon_v1p2','blimp_v1','fai1_v1','fai5_v1','glider_v1p2','paraglider_v1p2','paramotor_v1','skydiving_v1','weatherballoon_v1'}));
 
 %% The position output is in feet, so we need to determine the appropriate unit conversions
-if strfind(pfn{end},'uncor_') || is_unconv
+if ~isempty(strfind(pfn{end},'uncor_')) || is_unconv
     % Uncorrelated and unconventional models
     % % https://www.ll.mit.edu/sites/default/files/publication/doc/2018-12/Edwards_2009_ATC-348_WW-18098.pdf
     ur_speed = unitsratio('ft','nm') / 3600; % Knots to feet per second
@@ -148,13 +148,7 @@ end
 if L(1) < 0; L(1) = 0; end
 
 % Subdirectories
-if is_unconv
-    for i=1:1:size(L,1)
-        mkdir([p.Results.out_dir_parent filesep sprintf('%ift',L(i,1))]);
-    end
-    fprintf('Generated %i directories\n',size(L,1));
-else
-    if strfind(pfn{end},'uncor_')
+if ~isempty(strfind(pfn{end},'uncor_'))
         G = unique(T_initial.(idx_initial_geographic));
         A = unique(T_initial.(idx_initial_airspace));
         GAL = combvec(G',A',L')';
@@ -163,9 +157,11 @@ else
             if exist(iDir,'dir') ~=7; mkdir(iDir);end
         end
         fprintf('Generated %i directories\n',size(GAL,1));
-    else
-        error('sample2track:model','%s has not been tested with these function...wont create output directories\n',pfn{end});
+else
+    for i=1:1:size(L,1)
+        mkdir([p.Results.out_dir_parent filesep sprintf('%ift',L(i,1))]);
     end
+    fprintf('Generated %i directories\n',size(L,1));
 end
 
 %% Iterate
