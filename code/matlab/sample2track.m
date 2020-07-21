@@ -1,5 +1,8 @@
+% Copyright 2008 - 2020, MIT Lincoln Laboratory
+% SPDX-License-Identifier: BSD-2-Clause
 function [isGood,T_initial] = sample2track(parameters_filename,initial_filename,transition_filename,varargin)
 
+%% Input Parser
 p = inputParser;
 
 % Required

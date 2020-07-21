@@ -1,3 +1,5 @@
+% Copyright 2008 - 2020, MIT Lincoln Laboratory
+% SPDX-License-Identifier: BSD-2-Clause
 function parameters = em_read(filename)
 % EM_READ  Reads an encounter model parameters file.
 % Reads an encounter model parameters file and returns a structure

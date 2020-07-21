@@ -1,3 +1,5 @@
+% Copyright 2008 - 2020, MIT Lincoln Laboratory
+% SPDX-License-Identifier: BSD-2-Clause
 function D = events2samples(initial, events)
 % D - an n x t_max matrix
 

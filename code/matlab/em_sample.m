@@ -1,3 +1,5 @@
+% Copyright 2008 - 2020, MIT Lincoln Laboratory
+% SPDX-License-Identifier: BSD-2-Clause
 function em_sample(parameters_filename, varargin)
 % EM_SAMPLE Outputs samples from an encounter model to files.
 %   Outputs samples into two specified files from an encounter model

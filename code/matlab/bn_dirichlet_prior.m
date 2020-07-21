@@ -1,3 +1,5 @@
+% Copyright 2008 - 2020, MIT Lincoln Laboratory
+% SPDX-License-Identifier: BSD-2-Clause
 function alpha = bn_dirichlet_prior(N, prior)
 % INPUT:
 % N - a cell array

@@ -1,0 +1,6 @@
+SPDXVersion: SPDX-2.1
+DataLicense: CC-BY-NC-4.0
+PackageName: em-model-manned-bayes
+PackageOriginator: MIT Lincoln Laboratory
+PackageHomePage: https://github.com/Airspace-Encounter-Models/em-model-manned-bayes
+PackageLicenseDeclared: BSD-2-Clause

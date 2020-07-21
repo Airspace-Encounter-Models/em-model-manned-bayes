@@ -1,3 +1,5 @@
+% Copyright 2008 - 2020, MIT Lincoln Laboratory
+% SPDX-License-Identifier: BSD-2-Clause
 function [initial, events] = dbn_sample(G_initial, G_transition, temporal_map, r, N_initial, N_transition, dirichlet_initial, dirichlet_transition, t_max, initial)
 % INPUT:
 % G_initial - initial distribution graph structure

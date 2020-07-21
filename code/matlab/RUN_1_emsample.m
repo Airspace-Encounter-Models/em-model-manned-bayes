@@ -1,11 +1,13 @@
+% Copyright 2008 - 2020, MIT Lincoln Laboratory
+% SPDX-License-Identifier: BSD-2-Clause
 %% Inputs
 inDir = [getenv('AEM_DIR_BAYES') filesep 'model'];
 model = 'uncor_1200code_v2p2'; % the name of the parameters file
 
 outDir = [getenv('AEM_DIR_BAYES') filesep 'output' filesep model filesep date];
 
-num_initial_samples = 100; % number of samples to generate
-num_transition_samples = 120; % the number of steps to sample from the transition network
+num_initial_samples = 1000000; % number of samples to generate
+num_transition_samples = 160; % the number of steps to sample from the transition network
 
 % For loading balancing, don't write all samples to a single file
 max_samples_perfile = 10000; % Maximum number of samples per file

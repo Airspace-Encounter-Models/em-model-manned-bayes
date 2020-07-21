@@ -1,3 +1,5 @@
+% Copyright 2008 - 2020, MIT Lincoln Laboratory
+% SPDX-License-Identifier: BSD-2-Clause
 function [order,err] = bn_sort(G)
 % BN_SORT Produces a topological sort of a Bayesian network.
 %   Returns an array specifying the indices of variables in topological
