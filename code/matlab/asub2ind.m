@@ -1,5 +1,5 @@
 % Copyright 2008 - 2020, MIT Lincoln Laboratory
-% SPDX-License-Identifier: BSD-2-Clause
+% SPDX-License-Identifier: GPL-2.0-only
 function ndx = asub2ind(siz,x)
 % ASUB2IND Linear index from multiple subscripts.
 %   Returns a linder index from multiple subscripts assuming a matrix of a

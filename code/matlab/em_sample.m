@@ -1,5 +1,5 @@
 % Copyright 2008 - 2020, MIT Lincoln Laboratory
-% SPDX-License-Identifier: BSD-2-Clause
+% SPDX-License-Identifier: GPL-2.0-only
 function em_sample(parameters_filename, varargin)
 % EM_SAMPLE Outputs samples from an encounter model to files.
 %   Outputs samples into two specified files from an encounter model
@@ -119,4 +119,3 @@ if ~isempty(events)
     end
 end
 x = events2samples(initial, events);
-

@@ -1,11 +1,5 @@
 % Copyright 2008 - 2020, MIT Lincoln Laboratory
-% SPDX-License-Identifier: BSD-2-Clause
-%% Inputs
-% Input from RUN_1_emsample
-% Also used here
-model = 'uncor_1200code_v2p2';
-d = '16-Jul-2020'; % date
-num_files = 100;
+% SPDX-License-Identifier: GPL-2.0-only
 parameters_filename = [getenv('AEM_DIR_BAYES') filesep 'model' filesep model '.txt'];
 
 % Output from RUN_1_emsample
