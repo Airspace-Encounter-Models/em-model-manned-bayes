@@ -1,3 +1,5 @@
+% Copyright 2008 - 2020, MIT Lincoln Laboratory
+% SPDX-License-Identifier: GPL-2.0-only
 function x = dediscretize(d, parameters, zero_bins, wrap)
 % DEDISCRETIZE  Uniformly samples a value within the parameters bin
 % specified in d. Variables that fall within a zero_bin are set to 0.

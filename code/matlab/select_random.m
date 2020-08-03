@@ -1,3 +1,5 @@
+% Copyright 2008 - 2020, MIT Lincoln Laboratory
+% SPDX-License-Identifier: GPL-2.0-only
 function index = select_random(weights)
 % SELECT_RANDOM Randomly selects an index according to specified weights.
 %   Returns a randomly selected index according to the distribution

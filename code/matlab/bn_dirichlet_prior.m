@@ -1,3 +1,5 @@
+% Copyright 2008 - 2020, MIT Lincoln Laboratory
+% SPDX-License-Identifier: GPL-2.0-only
 function alpha = bn_dirichlet_prior(N, prior)
 % INPUT:
 % N - a cell array
@@ -21,4 +23,3 @@ else
         alpha{i} = prior(ones(r, q));
     end
 end
-

@@ -1,9 +1,11 @@
+% Copyright 2008 - 2020, MIT Lincoln Laboratory
+% SPDX-License-Identifier: GPL-2.0-only
 %% Inputs
 % Input from RUN_1_emsample
 % Also used here
-model = 'uncor_1200code_v2p2';
-d = '23-Jun-2020'; % date
-num_files = 1;
+model = 'uncor_allcode_rotorcraft_v1';
+d = '31-Jul-2020'; % date
+num_files = 40;
 parameters_filename = [getenv('AEM_DIR_BAYES') filesep 'model' filesep model '.txt'];
 
 % Output from RUN_1_emsample
@@ -22,7 +24,7 @@ if ~any(strcmpi({product_info.Name},'Deep Learning Toolbox')) && ~any(strcmpi({p
 end
 
 %% Iterate and Execute
-for i=1:1:num_files
+parfor i=1:1:num_files
     tic;
     % Create filenames and directories
     initial_filename = [initial_base '_' num2str(i) '.txt'];
