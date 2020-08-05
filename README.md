@@ -95,9 +95,12 @@ Filename | Model | Description (Version) | Altitude Scope
 
 Bayesian network models trained from observations by the [OpenSky Network](https://github.com/openskynetwork) of [ADS-B](https://www.faa.gov/nextgen/programs/adsb/) equipped aircraft. The OpenSky Network collects data via a worldwide network of crowdsourced receivers of ADS-B, an operational surveillance technology for tracking aircraft. The network, started in 2012 with 12 European sensors, has grown to over a thousand worldwide active sensors. ADS-B equipped aircraft automatically self-report their position to ground stations and other equipped aircraft. Also the annual national aircraft registries of the United States, Canada, Ireland, and the Netherlands were used to identify aircraft type based on the Mode S ICAO24 address from the ADS-B data.
 
-These models use the same directed acyclic graph as the [RADES-based](#rades-based-models) uncorrelated 1200-code model. The initial network was slightly modified by adding a lower altitude bin of [50, 500] feet AGL and changing the highest altitude bin to [3000, 5000] feet AGL. Version 1.0 of these models were trained from observations over the United States and Puerto Rico for 85 Mondays across 2018-2020. Across all models, this constitutes about 250,000 flight hours of observations below 5,000 feet AGL.
+Version 1.0 of these models were trained from observations over the United States and Puerto Rico for 85 Mondays across 2018-2020. Across all models, this constitutes about 250,000 flight hours of observations below 5,000 feet AGL. The following figure illustrates the geographic boundaries for these models.
 
-Unlike the RADES-based 1200-code model, no transponder [Mode 3A/C](https://en.wikipedia.org/wiki/Air_traffic_control_radar_beacon_system) filtering was completed when training these models. It has yet to be determined if these models can be surrogates for aircraft not equipped with ADS-B.
+<p align="center"> <img src="./doc/map-osn-geobounds-ak.png" width="400">  <img src="./doc/map-osn-geobounds-conus.png" width="400"> </p>
+<p align="center"> <img src="./doc/map-osn-geobounds-hi.png" width="400">  <img src="./doc/map-osn-geobounds-pr.png" width="400"> </p>
+
+These models use the same directed acyclic graph as the [RADES-based](#rades-based-models) uncorrelated 1200-code model. The initial network was slightly modified by adding a lower altitude bin of [50, 500] feet AGL and changing the highest altitude bin to [3000, 5000] feet AGL. Unlike the RADES-based 1200-code model, no transponder [Mode 3A/C](https://en.wikipedia.org/wiki/Air_traffic_control_radar_beacon_system) filtering was completed when training these models. It has yet to be determined if these models can be surrogates for aircraft not equipped with ADS-B.
 
 *These models are in active development and may be updated multiple times throughout 2020.*
 
@@ -143,11 +146,11 @@ Filename | Model | Description (Version) | Altitude Scope
 
 A Bayesian network describe trained from an estimated 2,526,000 observations across 758 flight hours. The training observations were sourced from FOQA DFDR data provided by a Massachusetts-based HAA provider. This model should only be used to simulate HAA rotorcraft operations, it has not been validated to be representative of other rotorcraft operations.
 
-This Bayesian model is currently not available and not included in the [model directory](./model/README.md). Also note that the altitude layer variable in this model has units of feet MSL, whereas majority of the models use feet AGL.
+While the Bayesian model is currently available and included in the [model directory](./model/README.md), formal technical documentation has not been fully released for the model yet. Also note that the altitude layer variable in this model has units of feet MSL, whereas majority of the models use feet AGL. We are planning to release a dataset of sampled trajectories to enable model use and accessability.
 
 Filename | Model | Description (Version) | Altitude Scope
 :---  | :---  | :---  | :---:  
-N/A| HAA | Rotorcraft of a Massachusetts-based HAA operator | (0, 5000]
+[haa_v1.txt](./model/haa_v1.txt) | HAA | Rotorcraft of a Massachusetts-based HAA operator | (0, 5000]
 
 ## Frequently Asked Questions
 
