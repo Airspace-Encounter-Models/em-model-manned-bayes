@@ -1,6 +1,6 @@
+function S = bn_sample(G, r, N, alpha, num_samples, start)
 % Copyright 2008 - 2020, MIT Lincoln Laboratory
 % SPDX-License-Identifier: GPL-2.0-only
-function S = bn_sample(G, r, N, alpha, num_samples, start)
 % BN_SAMPLE Produces a sample from a Bayesian network.
 %   Returns a matrix whose rows consist of n-dimensional samples from the
 %   specified Bayesian network.
@@ -16,14 +16,8 @@ function S = bn_sample(G, r, N, alpha, num_samples, start)
 %   all of its parents, if any, are also preset. WARNING: Will currently
 %   only allow discrete parameters to be preset.
 
-[order,err] = bn_sort(G);
-
-% Potential replacement for bn_sort
-% [n,H] = toposort(digraph(G));
-
-if err
-  error('Network could not be hierarchically sorted');
-end
+% topological sort bayes net
+order = bn_sort(G);
 
 n = length(N);
 

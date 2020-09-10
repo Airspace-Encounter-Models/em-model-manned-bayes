@@ -1,6 +1,6 @@
+function em_sample(parameters_filename, varargin)
 % Copyright 2008 - 2020, MIT Lincoln Laboratory
 % SPDX-License-Identifier: GPL-2.0-only
-function em_sample(parameters_filename, varargin)
 % EM_SAMPLE Outputs samples from an encounter model to files.
 %   Outputs samples into two specified files from an encounter model
 %   described in a file.
@@ -25,6 +25,10 @@ addOptional(p,'transition_output_filename',[getenv('AEM_DIR_BAYES') filesep 'out
 addOptional(p,'num_initial_samples',100,@isnumeric);
 addOptional(p,'num_transition_samples',60,@isnumeric);
 
+% Optional - Boundaries
+addOptional(p,'isOverwriteZeroBoundaries',false,@islogical); % If true, sample bins index and not produce a sampled value
+addOptional(p,'idxZeroBoundaries',[1 2 3], @isnumeric); % Index of parameters.boundaries to force to be zero / empty
+
 % Optional
 addOptional(p,'rng_seed',42,@isnumeric); % Random seed
 
@@ -36,7 +40,8 @@ rng(p.Results.rng_seed,'twister');
 
 %% Read and create priors
 % read parameters
-parameters = em_read(parameters_filename);
+parameters = em_read(parameters_filename,...
+    'isOverwriteZeroBoundaries',p.Results.isOverwriteZeroBoundaries,'idxZeroBoundaries',p.Results.idxZeroBoundaries);
 
 % create priors
 dirichlet_initial = bn_dirichlet_prior(parameters.N_initial);
