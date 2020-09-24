@@ -1,6 +1,6 @@
-% Copyright 2008 - 2020, MIT Lincoln Laboratory
-% SPDX-License-Identifier: GPL-2.0-only
 function events = resample_events(initial, events, rates)
+% Copyright 2008 - 2020, MIT Lincoln Laboratory
+% SPDX-License-Identifier: BSD-2-Clause
 % RESAMPLE_EVENTS generates additional events within a sampled bin
 % according to the desired resample rates. This mitigates the excessive
 % variability in the vertical rates, turn rates, and acceleration that

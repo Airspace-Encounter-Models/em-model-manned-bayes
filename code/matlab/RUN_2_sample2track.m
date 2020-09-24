@@ -1,5 +1,11 @@
 % Copyright 2008 - 2020, MIT Lincoln Laboratory
-% SPDX-License-Identifier: GPL-2.0-only
+% SPDX-License-Identifier: BSD-2-Clause
+%% Inputs
+% Input from RUN_1_emsample
+% Also used here
+model = 'uncor_allcode_rotorcraft_v1';
+d = '31-Jul-2020'; % date
+num_files = 40;
 parameters_filename = [getenv('AEM_DIR_BAYES') filesep 'model' filesep model '.txt'];
 
 % Output from RUN_1_emsample
