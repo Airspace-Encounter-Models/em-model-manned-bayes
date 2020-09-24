@@ -1,5 +1,5 @@
 % Copyright 2008 - 2020, MIT Lincoln Laboratory
-% SPDX-License-Identifier: GPL-2.0-only
+% SPDX-License-Identifier: BSD-2-Clause
 %% Inputs
 inDir = [getenv('AEM_DIR_BAYES') filesep 'model'];
 model = 'uncor_1200code_v2p1'; % the name of the parameters file

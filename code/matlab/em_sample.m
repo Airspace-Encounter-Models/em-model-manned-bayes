@@ -1,6 +1,6 @@
 function em_sample(parameters_filename, varargin)
 % Copyright 2008 - 2020, MIT Lincoln Laboratory
-% SPDX-License-Identifier: GPL-2.0-only
+% SPDX-License-Identifier: BSD-2-Clause
 % EM_SAMPLE Outputs samples from an encounter model to files.
 %   Outputs samples into two specified files from an encounter model
 %   described in a file.

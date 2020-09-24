@@ -1,6 +1,6 @@
 function parms = em_read(parameters_filename,varargin)
 % Copyright 2008 - 2020, MIT Lincoln Laboratory
-% SPDX-License-Identifier: GPL-2.0-only
+% SPDX-License-Identifier: BSD-2-Clause
 % EM_READ  Reads an encounter model parameters file.
 % Reads an encounter model parameters file and returns a structure
 % containing the parsed data.

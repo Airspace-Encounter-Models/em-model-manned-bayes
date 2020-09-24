@@ -1,6 +1,6 @@
-% Copyright 2008 - 2020, MIT Lincoln Laboratory
-% SPDX-License-Identifier: GPL-2.0-only
 function alpha = bn_dirichlet_prior(N, prior)
+% Copyright 2008 - 2020, MIT Lincoln Laboratory
+% SPDX-License-Identifier: BSD-2-Clause
 % INPUT:
 % N - a cell array
 % prior - either a numeric prior or 'dbe' for dbe prior (1/rq)

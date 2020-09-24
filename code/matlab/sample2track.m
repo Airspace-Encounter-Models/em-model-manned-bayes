@@ -1,6 +1,7 @@
-% Copyright 2008 - 2020, MIT Lincoln Laboratory
-% SPDX-License-Identifier: GPL-2.0-only
 function [isGood,T_initial] = sample2track(parameters_filename,initial_filename,transition_filename,varargin)
+% Copyright 2008 - 2020, MIT Lincoln Laboratory
+% SPDX-License-Identifier: BSD-2-Clause
+% See also RUN_2_sample2track, em_read
 
 %% Input Parser
 p = inputParser;
@@ -38,6 +39,10 @@ addOptional(p,'label_transition_speed','dotV_t_1_'); % \dot v(t+1)
 addOptional(p,'label_transition_altitude','dotH_t_1_'); % \dot h(t+1)
 addOptional(p,'label_transition_heading','dotPsi_t_1_' ); % \dot \psi(t+1)
 
+% Optional - Boundaries
+addOptional(p,'isOverwriteZeroBoundaries',false,@islogical); % If true
+addOptional(p,'idxZeroBoundaries',[1 2 3], @isnumeric); % Index of parameters.boundaries to force to be zero / empty
+
 % Optional - Rejection Sampling
 addOptional(p,'min_altitude_ft',0, @isnumeric);
 
@@ -53,7 +58,7 @@ rng(p.Results.rng_seed,'twister');
 
 %% Load files
 % Parameters
-parameters = em_read(parameters_filename);
+parameters = em_read(parameters_filename,'isOverwriteZeroBoundaries',p.Results.isOverwriteZeroBoundaries,'idxZeroBoundaries',p.Results.idxZeroBoundaries););
 
 labels_init = matlab.lang.makeValidName(erase(parameters.labels_initial,{'"','\'}));
 labels_trans = matlab.lang.makeValidName(erase(parameters.labels_transition(parameters.temporal_map(:,2)),{'"','\'}));
