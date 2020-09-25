@@ -2,3 +2,4 @@ language: matlab
 matlab:
   - latest  # Default MATLAB release on Travis CI
   - R2019b
+script: matlab -batch 'startup_bayes'
