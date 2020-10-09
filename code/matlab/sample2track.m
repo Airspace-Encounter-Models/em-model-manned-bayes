@@ -58,7 +58,7 @@ rng(p.Results.rng_seed,'twister');
 
 %% Load files
 % Parameters
-parameters = em_read(parameters_filename,'isOverwriteZeroBoundaries',p.Results.isOverwriteZeroBoundaries,'idxZeroBoundaries',p.Results.idxZeroBoundaries););
+parameters = em_read(parameters_filename,'isOverwriteZeroBoundaries',p.Results.isOverwriteZeroBoundaries,'idxZeroBoundaries',p.Results.idxZeroBoundaries);
 
 labels_init = matlab.lang.makeValidName(erase(parameters.labels_initial,{'"','\'}));
 labels_trans = matlab.lang.makeValidName(erase(parameters.labels_transition(parameters.temporal_map(:,2)),{'"','\'}));
