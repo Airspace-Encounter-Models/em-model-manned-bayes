@@ -1,0 +1,7 @@
+env:
+  - AEM_DIR_BAYES=$TRAVIS_BUILD_DIR
+language: matlab
+matlab:
+  - latest  # Default MATLAB release on Travis CI
+  - R2020a
+script: matlab -batch 'startup_bayes'
