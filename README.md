@@ -86,8 +86,8 @@ Filename | Model | Description (Version) | Altitude Scope
 :---  | :---  | :---  | :---:  
 [cor_v1.txt](./model/cor_v1.txt) | correlated | Aircraft squawking a Mode 3A/C discrete code over the CONUS (v1.1) | [1000, Inf]
 [cor_v2p1.txt](./model/cor_v2p1.txt) | correlated | Aircraft squawking a Mode 3A/C discrete code (v2.1) | [1000, Inf]
-[uncor_1200_code_v1.txt](./model/uncor_1200_code_v1.txt) | uncorrelated | Aircraft squawking Mode 3A/C of 1200 over the CONUS (v1.0) <br> Surrogate for conventional aircraft without transponders | [500, 18000]
-[uncor_1200_code_v2p1.txt](./model/uncor_1200_code_v2p1.txt) | uncorrelated | Aircraft squawking Mode 3A/C of 1200 (v2.x) <br> Surrogate for conventional aircraft without transponders | [500, 18000]
+[uncor_1200_code_v1.txt](./model/uncor_1200code_v1.txt) | uncorrelated | Aircraft squawking Mode 3A/C of 1200 over the CONUS (v1.0) <br> Surrogate for conventional aircraft without transponders | [500, 18000]
+[uncor_1200_code_v2p1.txt](./model/uncor_1200code_v2p1.txt) | uncorrelated | Aircraft squawking Mode 3A/C of 1200 (v2.x) <br> Surrogate for conventional aircraft without transponders | [500, 18000]
 [littoral_uncor_v1.txt](./model/littoral_uncor_v1.txt) (deprecated) | correlated | Aircraft squawking Mode 3A/C of 1200 over littoral regions (v1.0) | [500, 18000]
 [littoral_cor_v1.txt](./model/littoral_cor_v1.txt) (deprecated) | uncorrelated | Aircraft squawking a Mode 3A/C discrete code over littoral regions (v1.0)  | [1000, 45000]
 
