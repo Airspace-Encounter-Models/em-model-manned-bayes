@@ -103,7 +103,7 @@ Version 1.2 of these models were trained from observations for 104 Mondays acros
 
 <p align="center"> <img src="./doc/map-osn-v1p2.png" alt="Geographic bounds for version 1.2 of the OpenSky models" height="300"> </p>
 
-These models use the same directed acyclic graph as the [RADES-based](#rades-based-models) uncorrelated 1200-code model. The initial network was slightly modified by adding a lower altitude bin of [50, 500] feet AGL and changing the highest altitude bin to [3000, 5000] feet AGL. Unlike the RADES-based 1200-code model, no transponder [Mode 3A/C](https://en.wikipedia.org/wiki/Air_traffic_control_radar_beacon_system) filtering was completed when training these models. Refer to this preprint for guidance on which models can be surrogates for aircraft not equipped with ADS-B.
+These models use the same directed acyclic graph as the [RADES-based](#rades-based-models) uncorrelated 1200-code model. The initial network was slightly modified by adding a lower altitude bin of [50, 500] feet AGL and changing the highest altitude bin to [3000, 5000] feet AGL. Similar to the RADES-based 1200-code model, transponder [Mode 3A/C](https://en.wikipedia.org/wiki/Air_traffic_control_radar_beacon_system) filtering was completed when training these models. Refer to this preprint for guidance on which models can be surrogates for aircraft not equipped with ADS-B.
 
 Filename | Model | Description (Version) | Altitude Scope
 :---  | :---  | :---  | :---:  
