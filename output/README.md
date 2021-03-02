@@ -6,7 +6,7 @@ Default directory where code saves outputs.
 
 DISTRIBUTION STATEMENT A. Approved for public release. Distribution is unlimited.
 
-© 2008-2020 Massachusetts Institute of Technology.
+© 2008-2021 Massachusetts Institute of Technology.
 
 This material is based upon work supported by the Federal Aviation Administration (FAA) and the National Aeronautics and Space Administration (NASA) under Air Force Contract No. FA8702-15-D-0001. Any opinions, findings, conclusions or recommendations expressed in this material are those of the author(s) and do not necessarily reflect the views of the FAA or NASA.
 

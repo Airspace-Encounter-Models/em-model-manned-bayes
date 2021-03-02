@@ -1,5 +1,5 @@
 function [initial, events] = dbn_hierarchical_sample(G_initial, G_transition, temporal_map, r_transition, N_initial, N_transition, dirichlet_initial, dirichlet_transition, sample_time, dediscretize_parameters, zero_bins, resample_rates, initial)
-% Copyright 2008 - 2020, MIT Lincoln Laboratory
+% Copyright 2008 - 2021, MIT Lincoln Laboratory
 % SPDX-License-Identifier: BSD-2-Clause
 % DBN_HIERARCHICAL_SAMPLE Calls dbn_sample() to generate samples from a
 % dynamic Bayesian network. Variables are sampled discretely in bins and

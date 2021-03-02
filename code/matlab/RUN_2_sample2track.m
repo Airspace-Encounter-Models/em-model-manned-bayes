@@ -1,4 +1,4 @@
-% Copyright 2008 - 2020, MIT Lincoln Laboratory
+% Copyright 2008 - 2021, MIT Lincoln Laboratory
 % SPDX-License-Identifier: BSD-2-Clause
 %% Inputs
 % Input from RUN_1_emsample

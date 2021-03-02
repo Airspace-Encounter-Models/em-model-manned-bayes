@@ -1,5 +1,5 @@
 function [isGood,T_initial] = sample2track(parameters_filename,initial_filename,transition_filename,varargin)
-% Copyright 2008 - 2020, MIT Lincoln Laboratory
+% Copyright 2008 - 2021, MIT Lincoln Laboratory
 % SPDX-License-Identifier: BSD-2-Clause
 % See also RUN_2_sample2track, em_read
 

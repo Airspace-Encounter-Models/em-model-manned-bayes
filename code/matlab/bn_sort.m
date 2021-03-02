@@ -1,5 +1,5 @@
 function order = bn_sort(G)
-% Copyright 2008 - 2020, MIT Lincoln Laboratory
+% Copyright 2008 - 2021, MIT Lincoln Laboratory
 % SPDX-License-Identifier: BSD-2-Clause
 % BN_SORT Produces a topological order of directed acyclic graph, such as a
 % Bayesian network. This function was updated in 2020 to use the MATLAB
