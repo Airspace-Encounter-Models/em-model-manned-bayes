@@ -1,5 +1,5 @@
 function S = bn_sample(G, r, N, alpha, num_samples, start)
-% Copyright 2008 - 2020, MIT Lincoln Laboratory
+% Copyright 2008 - 2021, MIT Lincoln Laboratory
 % SPDX-License-Identifier: BSD-2-Clause
 % BN_SAMPLE Produces a sample from a Bayesian network.
 %   Returns a matrix whose rows consist of n-dimensional samples from the

@@ -1,5 +1,5 @@
 function index = select_random(weights)
-% Copyright 2008 - 2020, MIT Lincoln Laboratory
+% Copyright 2008 - 2021, MIT Lincoln Laboratory
 % SPDX-License-Identifier: BSD-2-Clause
 % SELECT_RANDOM Randomly selects an index according to specified weights.
 %   Returns a randomly selected index according to the distribution
