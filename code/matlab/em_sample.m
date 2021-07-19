@@ -25,6 +25,9 @@ addOptional(p,'transition_output_filename',[getenv('AEM_DIR_BAYES') filesep 'out
 addOptional(p,'num_initial_samples',100,@isnumeric);
 addOptional(p,'num_transition_samples',60,@isnumeric);
 
+% Optional - Sampling
+addOptional(p,'start',{},@iscell);
+
 % Optional - Boundaries
 addOptional(p,'isOverwriteZeroBoundaries',false,@islogical); % If true, sample bins index and not produce a sampled value
 addOptional(p,'idxZeroBoundaries',[1 2 3], @isnumeric); % Index of parameters.boundaries to force to be zero / empty
@@ -46,6 +49,14 @@ parameters = em_read(parameters_filename,...
 % create priors
 dirichlet_initial = bn_dirichlet_prior(parameters.N_initial);
 dirichlet_transition = bn_dirichlet_prior(parameters.N_transition);
+
+% 
+if any(strcmp(p.UsingDefaults,'start'))
+    start = cell(1,length(parameters.N_initial));
+else
+    start = p.Results.start;
+end
+
 
 %% Create output files and create headers
 % Open output files
@@ -70,7 +81,7 @@ fprintf(f_transition, '\n');
 % Iterate
 for i = 1:p.Results.num_initial_samples
     % Create sample
-    [x, ~, ~] = create_sample(parameters, dirichlet_initial, dirichlet_transition, p.Results.num_transition_samples);
+    [x, ~, ~] = create_sample(parameters, dirichlet_initial, dirichlet_transition, p.Results.num_transition_samples, start);
     
     % print initial sample
     fprintf(f_initial, '%d ', i);
@@ -99,9 +110,9 @@ for i = 1:n
     alpha{i} = ones(r, q);
 end
 
-function [x, initial, events] = create_sample(p, dirichlet_initial, dirichlet_transition, sample_time)
+function [x, initial, events] = create_sample(parms, dirichlet_initial, dirichlet_transition, sample_time, start)
 % Sample model
-[initial, events] = dbn_sample(p.G_initial, p.G_transition, p.temporal_map, p.r_transition, p.N_initial, p.N_transition, dirichlet_initial, dirichlet_transition, sample_time);
+[initial, events] = dbn_sample(parms, dirichlet_initial, dirichlet_transition, sample_time, start);
 if isempty(events)
     events = [sample_time 0 0];
 else
@@ -109,18 +120,18 @@ else
 end
 
 % Within-bin resampling
-events = resample_events(initial, events, p.resample_rates);
+events = resample_events(initial, events, parms.resample_rates);
 
 % Dediscretize
 for i = 1:numel(initial)
-    if isempty(p.boundaries{i})
+    if isempty(parms.boundaries{i})
     else
-        initial(i) = dediscretize(initial(i), p.boundaries{i}, p.zero_bins{i});
+        initial(i) = dediscretize(initial(i), parms.boundaries{i}, parms.zero_bins{i});
     end
 end
 if ~isempty(events)
     for i = 1:(size(events,1)-1)
-        events(i,3) = dediscretize(events(i,3), p.boundaries{events(i,2)}, p.zero_bins{events(i,2)});
+        events(i,3) = dediscretize(events(i,3), parms.boundaries{events(i,2)}, parms.zero_bins{events(i,2)});
     end
 end
 x = events2samples(initial, events);

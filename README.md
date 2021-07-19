@@ -2,7 +2,7 @@
 
 The Bayesian network encounter models are a collection of MATLAB scripts that produce random samples from models of how different aircraft behave, as previously documented in MIT Lincoln Laboratory technical reports. All these models were originally developed by [MIT Lincoln Laboratory](https://www.ll.mit.edu/). Majority of these samples are of one independent aircraft track and a single sample is insufficient for a complete synthetic encounter. Refer to the [`em-overview/README`](https://github.com/Airspace-Encounter-Models/em-overview/blob/master/README.md#documentation) for model documentation. Also please refer to other software and documentation on how to fully generate an encounter.
 
-Each manned aircraft model is a Bayesian Network, a representation of a multivariate probability distribution as a directed acyclic graph. Models are trained using aircraft operational data derived from radar or other sensing system flight track data. For example, the following figure illustrates the initial Bayesian network for the extended uncorrelated encounter model.
+Each manned aircraft model is a set of Bayesian Networks, a representation of a multivariate probability distribution as a directed acyclic graph. Models are trained using aircraft operational data derived from radar or other sensing system flight track data. For example, this figure illustrates the initial Bayesian network for the extended uncorrelated encounter model.
 
 <p align="center"> <img src="./doc/uncor_initial_v2.png" alt="bayes net" height="400"> </p>
 
@@ -18,7 +18,7 @@ Each manned aircraft model is a Bayesian Network, a representation of a multivar
     - [GPS-Based Unconventional Model](#gps-based-unconventional-model)
     - [ETMS-Based Due Regard Model](#etms-based-due-regard-model)
     - [DFDR-Based Helicopter Air Ambulance Model](#dfdr-based-helicopter-air-ambulance-model)
-    - [Terminal Radar-Based Terminal Model](#terminal-radar-based-terminal-model)
+    - [Correlated Terminal Model](#correlated-terminal-model)
   - [Common Categorical Variables](#common-categorical-variables)
     - [Geographic Domain (G)](#geographic-domain-g)
     - [Airspace Class (A)](#airspace-class-a)
@@ -37,6 +37,7 @@ Each manned aircraft model is a Bayesian Network, a representation of a multivar
 
 Acronym | Phrase
  :--- | :---
+CPA | [closest point of approach](https://www.skybrary.aero/index.php/Closest_Point_of_Approach_(CPA))
 CONUS | [Contiguous United States](https://en.wikipedia.org/wiki/Contiguous_United_States)
 DFDR | [Digital Flight Data Recorder](https://en.wikipedia.org/wiki/Flight_recorder)
 ADS-B | [Automatic Dependent Surveillance-Broadcast](https://www.faa.gov/nextgen/programs/adsb/)
@@ -103,7 +104,7 @@ Version 1.2 of these models were trained from observations for 104 Mondays acros
 
 <p align="center"> <img src="./doc/map-osn-v1p2.png" alt="Geographic bounds for version 1.2 of the OpenSky models" height="300"> </p>
 
-These models use the same directed acyclic graph as the [RADES-based](#rades-based-models) uncorrelated 1200-code model. The initial network was slightly modified by adding a lower altitude bin of [50, 500] feet AGL and changing the highest altitude bin to [3000, 5000] feet AGL. Similar to the RADES-based 1200-code model, transponder [Mode 3A/C](https://en.wikipedia.org/wiki/Air_traffic_control_radar_beacon_system) filtering was completed when training these models. Refer to this [preprint](http://arxiv.org/abs/2103.04753) for guidance on which models can be surrogates for aircraft not equipped with ADS-B.
+These models use the same directed acyclic graph as the [RADES-based](#rades-based-models) uncorrelated 1200-code model. The initial network was slightly modified by adding a lower altitude bin of [50, 500] feet AGL and changing the highest altitude bin to [3000, 5000] feet AGL. Similar to the RADES-based 1200-code model, transponder [Mode 3A/C](https://en.wikipedia.org/wiki/Air_traffic_control_radar_beacon_system) filtering was completed when training these models. Refer to this [AIAA journal article](https://doi.org/10.2514/1.D0254) for guidance on which models can be surrogates for aircraft not equipped with ADS-B.
 
 Filename | Model | Description (Version) | Altitude Scope
 :---  | :---  | :---  | :---:  
@@ -159,13 +160,21 @@ Filename | Model | Description (Version) | Altitude Scope
 :---  | :---  | :---  | :---:  
 [haa_v1.txt](./model/haa_v1.txt) | HAA | Rotorcraft of a Massachusetts-based HAA operator | (0, 5000]
 
-### Terminal Radar-Based Terminal Model
+### Correlated Terminal Model
 
-A set of Bayesian networks tailored to address structured terminal operations, i.e., correlations between trajectories and the airfield and each other. FAA terminal radar track data over 3-8 months in 2015 at 14 single-runway airports throughout the National Airspace System have been used to train this model.
+A set of Bayesian networks tailored to address structured terminal operations, i.e., correlations between trajectories and the airfield and each other. The model is comprised to two main elements. The first component, the encounter geometry model, describes the geometrical conditions of two encounter aircraft at their point of closest approach. The second component, the trajectory generation model, then describes the flight path for each aircraft leading to and continuing from their point of closest approach.
 
-The Bayesian model has not been made available yet but a dataset of samples from this model is hosted on the MIT LL external website. You can access the dataset [here](https://www.ll.mit.edu/r-d/datasets/unmanned-aircraft-terminal-area-encounters).
+This model is unique in that it is one of the few correlated models and the only to have a separate encounter geometry model. The [RADES-based correlated model](#rades-based-models) has a single dynamic Bayesian network that captures both the relative geometry of the two aircraft and the dynamic states of each aircraft. The terminal model differs in that the relative geometry at CPA is modeled by the encounter geometry model and the dynamics of each aircraft are represented by aircraft trajectory models. There is a different trajectory model for each aircraft (ownship and intruder), with similar model structures. Furthermore these models were trained based on encounters where ownship was executing a straight-in landing or straight-out takeoff. There was no such restrictions on the intruder.
 
-*This model is in active development, with significant updates expected in 2021.*
+Encounter Geometry Model | Aircraft Trajectory Models
+:---:  | :---:  
+<img src="./doc/model_terminal_enc_geo.png" alt="terminal geometry model"> |  <img src="./doc/model_terminal_traj_fwd.png" alt="terminal trajectory model"> <img src="./doc/model_terminal_traj_bck.png" alt="terminal trajectory model"> 
+
+Two variants of this model have been trained. While the model structure is the same between the variants, different datasets were used for training. These two datasets were 1) FAA terminal radar track data over the period January through September 2015 throughout the NAS and 2) 190+ days of data over the period January 2019 through February 2020 from the OpenSky Network. These two sources of data have different assumptions and surveil different types of aircraft. Training multiple models enabled assessments of the sensitivity of the models to different biases; while mitigating some weakness for a given dataset.
+
+The Bayesian model has recently been made available but please contract the admins regarding access to the MATLAB code to sample the models to create encounters. The sampling software should be available later this year. Additionally, a dataset of samples from an early prototype of the model is hosted on the MIT LL external website. You can access the dataset [here](https://www.ll.mit.edu/r-d/datasets/unmanned-aircraft-terminal-area-encounters).
+
+*This model is in active development, with significant updates and additional documentation expected in 2021.*
 
 ## Common Categorical Variables
 
