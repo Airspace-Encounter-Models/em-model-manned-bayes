@@ -5,8 +5,17 @@ function index = select_random(weights)
 %   Returns a randomly selected index according to the distribution
 %   specified by a vector of weights.
 %
-%   INDEX = SELECT_RANDOM(WEIGHTS) returns a scalar index INDEX selected 
+%   INDEX = SELECT_RANDOM(WEIGHTS) returns a scalar index INDEX selected
 %   randomly according to the specified weights WEIGHTS represented as an
 %   array.
+
+%% Call rand
+% Sample uniformly distributed random numbers
+r = rand;
+
+%% Calculate
 s = cumsum(weights);
-index = find(s >= s(end)*rand, 1);
+sthres = s(end)*r;
+x = s >= sthres;
+index = find(x, 1,'first');
+

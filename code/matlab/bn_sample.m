@@ -1,4 +1,4 @@
-function S = bn_sample(G, r, N, alpha, num_samples, start)
+function S = bn_sample(G, r, N, alpha, num_samples, start, order)
 % Copyright 2008 - 2021, MIT Lincoln Laboratory
 % SPDX-License-Identifier: BSD-2-Clause
 % BN_SAMPLE Produces a sample from a Bayesian network.
@@ -11,23 +11,29 @@ function S = bn_sample(G, r, N, alpha, num_samples, start)
 %   number of samples is specified by NUM_SAMPLES. The array R specifies
 %   the number of bins associated with each variable.
 %
-%   Optional argument 'start', a cell array with same number of elements as
+%   'start', a cell array with same number of elements as
 %   N, allows parameters to be preset. A parameter can only be preset if
 %   all of its parents, if any, are also preset. WARNING: Will currently
 %   only allow discrete parameters to be preset.
+%
+%   Optional argument 'order', is the sorted order of the graphical
+%   structure G. This is calculated using bn_sort in em_read.
+%
+% SEE ALSO bn_sort select_random em_read
 
 % topological sort bayes net
-order = bn_sort(G);
+if nargin < 7
+  order = bn_sort(G); 
+end
 
 n = length(N);
 
-if nargin < 6
-  start = cell(1,n);
-else
-  assert(iscell(start));
-  assert(length(start) == n);
-end
+% Input handling
+assert(iscell(start));
+assert(length(start) == n);
+assert(length(order) == n);
 
+% Preallocate
 S = zeros(num_samples, n);
 
 for sample_index = 1:num_samples
