@@ -8,10 +8,12 @@ Each manned aircraft model is a set of Bayesian Networks, a representation of a 
 
 - [Bayesian Network Encounter Models](#bayesian-network-encounter-models)
   - [Nomenclature](#nomenclature)
-  - [Run Order](#run-order)
+  - [Initial Setup](#initial-setup)
     - [Persistent System Environment Variable](#persistent-system-environment-variable)
-    - [Sample the Model](#sample-the-model)
-    - [Generate Basic Tracks](#generate-basic-tracks)
+    - [em-core](#em-core)
+  - [Run Order](#run-order)
+    - [EncounterModel and UncorEncounterModel classes](#encountermodel-and-uncorencountermodel-classes)
+    - [Non-OOP RUN Scripts](#non-oop-run-scripts)
   - [Datafiles and Documentation](#datafiles-and-documentation)
     - [RADES-Based Models](#rades-based-models)
     - [OpenSky Network-Based Models](#opensky-network-based-models)
@@ -47,9 +49,9 @@ FOQA | [Flight Operational Quality Assurance](https://en.wikipedia.org/wiki/Flig
 HAA | [Helicopter Air Ambulance](https://www.faa.gov/regulations_policies/advisory_circulars/index.cfm/go/document.information/documentid/1027108)
 RADES | [84th Radar Evaluation Squadron](https://www.505ccw.acc.af.mil/About-Us/Fact-Sheets/Display/Article/376111/84th-radar-evaluation-squadron/)
 
-## Run Order
+## Initial Setup
 
-This section specifies the initial setup and run order for the repository.
+This section specifies the initial setup for the repository.
 
 ### Persistent System Environment Variable
 
@@ -63,13 +65,23 @@ export AEM_DIR_BAYES=PATH TO /em-model-manned-bayes
 
 You can confirm `AEM_DIR_BAYES` was set in unix by inspecting the output of `env`.
 
-### Sample the Model
+### em-core
 
-The main function is [`em_sample`](./code/matlab/em_sample.m) and we provide a run script,[`RUN_1_emsample`](./code/matlab/RUN_1_emsample.m), which calls the function. The function's input is are parameter files that describe the model's properties. The parameter files are located in the [model directory](./model/README.md).
+Clone [`em-core`](https://github.com/Airspace-Encounter-Models/em-core). Confirm that the system environment variable `AEM_DIR_CORE` has been set, as instructed by its [README](https://github.com/Airspace-Encounter-Models/em-core/blob/master/README.md#persistent-system-environment-variable). Please confirm you have compiled the mex function, `run_dynamics_fast`.
 
-### Generate Basic Tracks
+## Run Order
 
-The run script, [`RUN_2_sample2track`](./code/matlab/RUN_2_sample2track.m), calls [`sample2track`](./code/matlab/sample2track.m) to generate basic (x,y,z) tracks for some of the model samples. Not all models are currently supported and only uncorrelated, glider (unconventional), and paraglider (unconventional), and HAA samples have been tested with the function.
+This section describes the example run scripts and functions.
+
+### EncounterModel and UncorEncounterModel classes
+
+The latest version introduces object oriented programming with the addition of the `EncounterModel` superclass and `UncorEncounterModel` class. These classes enable the user to easily read in the ASCII parameter files with improved input handling. Using class methods, the `UncorEncounterModel` can now sample the model or generate local Cartesian or geodetic tracks with a few lines of code. Please see the run script, [`RUN_OOP`](./code/matlab/RUN_OOP.m), for a simple example using OOP.
+
+### Non-OOP RUN Scripts
+
+*The described functionality is expected to be removed in a future release*
+
+Prior to the OOP classes, model sampling was was previously solely demonstrated using run script,[`RUN_1_emsample`](./code/matlab/RUN_1_emsample.m), which calls the function, [`em_sample`](./code/matlab/em_sample.m). The run script and function have been partly updated to use the `EncounterModel` superclass but still samples the method without using class methods. A followup run script, [`RUN_2_sample2track`](./code/matlab/RUN_2_sample2track.m), calls [`sample2track`](./code/matlab/sample2track.m) to generate basic (x,y,z) tracks for some of the model samples. Not all models are currently supported and only uncorrelated, glider (unconventional), and paraglider (unconventional), and HAA samples have been tested with the function.
 
 ## Datafiles and Documentation
 

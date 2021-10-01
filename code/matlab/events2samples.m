@@ -2,13 +2,16 @@ function D = events2samples(initial, events)
 % Copyright 2008 - 2021, MIT Lincoln Laboratory
 % SPDX-License-Identifier: BSD-2-Clause
 % D - an n x t_max matrix
+%
+% SEE ALSO events2controls
 
+% Preallocate
 n = numel(initial);
 D = zeros(n,sum(events(:,1)));
-
 x = initial(:);
-t = 0;
 
+% Iterate over events
+t = 0;
 for event = events'
     delta_t = event(1);
     if event(2) == 0
