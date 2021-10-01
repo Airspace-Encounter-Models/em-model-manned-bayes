@@ -1,39 +1,6 @@
-# MATLAB Code
+# Terminal
 
-## Run Scripts
-
-### Classes
-
-File | Description |
-:--- | :--- |
-[RUN_uncor.m](RUN_uncor.m) | Samples and creates tracks from an uncorrelated encounter model using the `UncorEncounterModel` class
-[RUN_terminal.m](RUN_terminal.m) | Samples and creates encounters from the correlated terminal encounter model using the `CorTerminalModel` class
-
-### Function specific
-
-*The described functionality is expected to be removed in a future release*
-
-Prior to the OOP classes, model sampling was was previously solely demonstrated using run script,[`RUN_1_emsample`](./code/matlab/RUN_1_emsample.m), which calls the function, [`em_sample`](./code/matlab/em_sample.m). The run script and function have been partly updated to use the `EncounterModel` superclass but still samples the method without using class methods. A followup run script, [`RUN_2_sample2track`](./code/matlab/RUN_2_sample2track.m), calls [`sample2track`](./code/matlab/sample2track.m) to generate basic (x,y,z) tracks for some of the model samples. Not all models are currently supported and only uncorrelated, glider (unconventional), and paraglider (unconventional), and HAA samples have been tested with the function.
-
-File | Description |
-:--- | :--- |
-[RUN_1_emsample.m](RUN_1_emsample.m) | Samples an uncorrelated encounter model using `em_sample`
-[RUN_2_sample2track.m](RUN_2_sample2track.m) | Using `sample2track`, output first-order (t,x,y,z) tracks in .csv files from `RUN_1_emsample.m`
-
-## Functions
-
-The following are the core functions, this is not a comprehensive list:
-
-File | Description |
-:--- | :--- |
-[asub2ind.m](asub2ind.m) | Linear index from multiple subscripts.
-[bn_sample.m](bn_sample.m) | Produces a sample from a Bayesian network.
-[bn_sort.m](bn_sort.m) | Produces a topological sort of a Bayesian network.
-[dbn_sample.m](dbn_sample.m) | Samples from a dynamic Bayesian network.
-[em_read.m](em_read.m)  | Reads an encounter model parameters file.
-[em_sample.m](em_sample.m) | Outputs samples from an encounter model to files.
-[IdentifyGeographicVariable](IdentifyGeographicVariable.m) | Identifies the geographic domain for latitude, longitude coordinates
-[select_random.m](select_random.m) | Randomly selects an index according to specified weights.
+Default directory for output of the correlated terminal encounter model
 
 ## Distribution Statement
 

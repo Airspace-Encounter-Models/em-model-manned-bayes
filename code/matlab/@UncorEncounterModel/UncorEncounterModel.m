@@ -257,6 +257,8 @@ classdef UncorEncounterModel < EncounterModel
                     % make sure vertical rate not greater than airspeed
                     if initial(idxV)*1.68781 > abs(initial(idxDH))/60
                         isGood = true;
+                    else
+                        isGood = false;
                     end
                 end
                 
@@ -348,7 +350,7 @@ classdef UncorEncounterModel < EncounterModel
             isPlot = p.Results.isPlot;
             
             % Preallocate output
-            outResults = cell(nSamples,1);   
+            outResults = cell(nSamples,1);
             
             % Initial 2D position
             % Vertical axis set in for loop based on model sample
@@ -356,33 +358,32 @@ classdef UncorEncounterModel < EncounterModel
             e_ft = 0;
             
             % Model variable indicies
+            idxG = find(strcmp(obj.labels_initial,'"G"'));
+            idxA = find(strcmp(obj.labels_initial,'"A"'));
             idxL = find(strcmp(obj.labels_initial,'"L"'));
             idxV = find(strcmp(obj.labels_initial,'"v"'));
             idxDV = find(strcmp(obj.labels_initial,'"\dot v"'));
             idxDH = find(strcmp(obj.labels_initial,'"\dot h"'));
             idxDPsi = find(strcmp(obj.labels_initial,'"\dot \psi"'));
             
+            % If true, variable already discretized in initial sample
+            isDiscretized = cellfun(@isempty,obj.dediscretize_parameters);
+            
             % Some rejection sampling thresholds
             minAlt_ft = min(obj.boundaries{idxL}); % ft
             maxAlt_ft = max(obj.boundaries{idxL}); % ft
-            minSpeed_ft_s = min(obj.boundaries{idxV}) * 1.68780972222222; % v: KTAS -> ft/s
-            maxSpeed_ft_s = max(obj.boundaries{idxV}) * 1.68780972222222; % v: KTAS -> ft/s
-            
-            % Update minimum speed to 1 knot if zero
-            % If zero, it could cause an error with run_dynamics_fast
-            if minSpeed_ft_s == 0; minSpeed_ft_s = 1.7; end
-            
-            % Update minimum speed to 30 knots if not a designated rotorcraft
-            if ~obj.isRotorcraft && minSpeed_ft_s < 50; minSpeed_ft_s = 50; end
-            
+                
             % Other dynamic thresholds
             minDH_ft_s = min(obj.boundaries{idxDH}) / 60; % hdot: ft/min -> ft/s
             maxDH_ft_s = max(obj.boundaries{idxDH}) / 60; % hdot: ft/min -> ft/s
             
-            % Dynamic constraints
+            % Dynamic constraints for run_dynamics_fast
             % v_low,v_high,dh_ftps_min,dh_ftps_max,qmax,rmax
             % ftps, ftps, ftps, ftps, rad, rad
-            dyn = [1.7 maxSpeed_ft_s minDH_ft_s maxDH_ft_s deg2rad(3), 1000000];
+            % We don't use minSpeed_ft_s and maxSpeed_ft_s because we don't
+            % want to have the dynamics model in run_dynamics_fast override
+            % samples from the model.
+            dyn = [1.7 max(obj.boundaries{idxV})* 1.68780972222222 minDH_ft_s maxDH_ft_s deg2rad(3), 1000000];
             
             % Iterate over samples
             for ii=1:1:nSamples
@@ -393,7 +394,7 @@ classdef UncorEncounterModel < EncounterModel
                     [initial, ~, ~, EME] = obj.sample(1,sample_time,'seed',seed,'isQuantize500',isQuantize500);
                     
                     % Seed has been used, so advance it
-                    % If seed = NaN, nan + 1 = nan. 
+                    % If seed = NaN, nan + 1 = nan.
                     seed = seed + 1;
                     
                     % Parse
@@ -417,12 +418,22 @@ classdef UncorEncounterModel < EncounterModel
                     % Simulate track using run_dynamics_fast
                     results = run_dynamics_fast(ic,controls,dyn,ic,controls,dyn,sample_time);
                     results = results(1);
+                    isSec = rem(results.time,1) == 0;
+                    
+                    % Calculate vertical rate (magnitude)
+                    results_dh_ft_s = computeVerticalRate(results.up_ft(isSec),results.time(isSec));
+                    results_dh_ft_s = abs(results_dh_ft_s);
+                    
+                    % Calculates speed and vertical rate limits based on
+                    % encounter model distributions
+                    dynLims = obj. getDynamicLimits(initial,results,idxG,idxA,idxL,idxV,idxDH,isDiscretized);
                     
                     % Rejection sampling criteria
                     isViolateL = any(results.up_ft < minAlt_ft | results.up_ft > maxAlt_ft);
-                    isViolateV = any(results.speed_ftps < minSpeed_ft_s | results.speed_ftps > maxSpeed_ft_s);
-                    
-                    if isViolateL | isViolateV
+                    isViolateV = any(results.speed_ftps < dynLims.minVel_ft_s | results.speed_ftps > dynLims.maxVel_ft_s);
+                    isViolateDH = any(results_dh_ft_s > dynLims.maxVertRate_ft_s);
+   
+                    if isViolateL | isViolateV | isViolateDH
                         isGood = false;
                     else
                         isGood = true;
@@ -471,45 +482,9 @@ classdef UncorEncounterModel < EncounterModel
                 end
             end
         end
-    end
-    
-    %%
-    %     %% LLSC Functions
-    %     methods
-    %         function result = arrayForLLGrid(obj)
-    %             result = [obj.all_repeat; obj.all_change; cells2array(obj.N_initial); cells2array(obj.N_transition)]';
-    %         end
-    %         function loadArrayForLLGrid(obj,result)
-    %             result = sum(result,1);
-    %             result = result';
-    %
-    %             first_all_repeat = 1;
-    %             last_all_repeat  = numel(obj.all_repeat);
-    %             first_all_change = last_all_repeat+1;
-    %             last_all_change  = last_all_repeat+numel(obj.all_change);
-    %             first_N_initial = last_all_change+1;
-    %             last_N_initial  = last_all_change+numel(cells2array(obj.N_initial));
-    %             first_N_transition = last_N_initial+1;
-    %             last_N_transition  = last_N_initial+numel(cells2array(obj.N_transition));
-    %
-    %             obj.all_repeat = result(first_all_repeat:last_all_repeat);
-    %             obj.all_change = result(first_all_change:last_all_change);
-    %
-    %             dims_initial = bn_getdims(obj.G_initial, obj.r_initial);
-    %             dims_transition = dbn_getdims(obj.G_transition, obj.r_transition, obj.temporal_map);
-    %
-    %             obj.N_initial = array2cells(result(first_N_initial:last_N_initial), dims_initial);
-    %             obj.N_transition = array2cells(result(first_N_transition:last_N_transition), dims_transition);
-    %         end
-    %     end
-    %
-    %         function value = get.variables2controls(obj)
-    %             value = [ find(strcmp('dh', obj.labels_initial_alt)), ...
-    %                 find(strcmp('dpsi', obj.labels_initial_alt)), ...
-    %                 find(strcmp('dv', obj.labels_initial_alt)) ];
-    %         end
-    %     end
-    %
-    
-    
+        
+
+        
+        
+    end   
 end % End class def

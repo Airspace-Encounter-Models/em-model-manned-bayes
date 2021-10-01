@@ -12,12 +12,14 @@ Each manned aircraft model is a set of Bayesian Networks, a representation of a 
     - [Persistent System Environment Variable](#persistent-system-environment-variable)
     - [em-core](#em-core)
   - [Run Order](#run-order)
-    - [EncounterModel and UncorEncounterModel classes](#encountermodel-and-uncorencountermodel-classes)
-    - [Non-OOP RUN Scripts](#non-oop-run-scripts)
+    - [Classes (Object-Oriented Programming)](#classes-object-oriented-programming)
+    - [Run Scripts](#run-scripts)
   - [Datafiles and Documentation](#datafiles-and-documentation)
-    - [RADES-Based Models](#rades-based-models)
-    - [OpenSky Network-Based Models](#opensky-network-based-models)
-    - [GPS-Based Unconventional Model](#gps-based-unconventional-model)
+    - [Correlated Extended Model](#correlated-extended-model)
+    - [Uncorrelated Conventional Aircraft](#uncorrelated-conventional-aircraft)
+      - [RADES-Based](#rades-based)
+      - [OpenSky Network-Based](#opensky-network-based)
+    - [GPS-Based Uncorrelated Unconventional Aircraft Models](#gps-based-uncorrelated-unconventional-aircraft-models)
     - [ETMS-Based Due Regard Model](#etms-based-due-regard-model)
     - [DFDR-Based Helicopter Air Ambulance Model](#dfdr-based-helicopter-air-ambulance-model)
     - [Correlated Terminal Model](#correlated-terminal-model)
@@ -71,17 +73,15 @@ Clone [`em-core`](https://github.com/Airspace-Encounter-Models/em-core). Confirm
 
 ## Run Order
 
-This section describes the example run scripts and functions.
+This section describes main object-oriented programming (OOP) classes and example run scripts.
 
-### EncounterModel and UncorEncounterModel classes
+### Classes (Object-Oriented Programming)
 
-The latest version introduces object oriented programming with the addition of the `EncounterModel` superclass and `UncorEncounterModel` class. These classes enable the user to easily read in the ASCII parameter files with improved input handling. Using class methods, the `UncorEncounterModel` can now sample the model or generate local Cartesian or geodetic tracks with a few lines of code. Please see the run script, [`RUN_OOP`](./code/matlab/RUN_OOP.m), for a simple example using OOP.
+The latest release introduces object oriented programming with the addition of the `EncounterModel` superclass, `UncorEncounterModel` class, and `CorTerminalModel` class. These classes enable the user to easily read in the ASCII parameter files with improved input handling. Classes are not yet available for the RADES-based correlated, ETMS-based due regard, DFDR-based HAA, and most unconventional models.
 
-### Non-OOP RUN Scripts
+### Run Scripts
 
-*The described functionality is expected to be removed in a future release*
-
-Prior to the OOP classes, model sampling was was previously solely demonstrated using run script,[`RUN_1_emsample`](./code/matlab/RUN_1_emsample.m), which calls the function, [`em_sample`](./code/matlab/em_sample.m). The run script and function have been partly updated to use the `EncounterModel` superclass but still samples the method without using class methods. A followup run script, [`RUN_2_sample2track`](./code/matlab/RUN_2_sample2track.m), calls [`sample2track`](./code/matlab/sample2track.m) to generate basic (x,y,z) tracks for some of the model samples. Not all models are currently supported and only uncorrelated, glider (unconventional), and paraglider (unconventional), and HAA samples have been tested with the function.
+The run script, [`RUN_uncor`](./code/matlab/RUN_uncor.m), demonstrates how using `UncorEncounterModel` can sample the uncorrelated encounter model or generate local Cartesian or geodetic uncorrelated tracks with a few lines of code. A similar run script, [`RUN_terminal`](./code/matlab/RUN_terminal.m) demonstrates the basic functionality of the correlated terminal encounter model.
 
 ## Datafiles and Documentation
 
@@ -89,26 +89,35 @@ Refer to the [`em-overview/README`](https://github.com/Airspace-Encounter-Models
 
 Furthermore, the initial network for each model aggregates all the training observations across the training time window. It does not provide guidance on the density of aircraft. For example, suppose that a model was trained using 2 days of data. If 80% of the observations were from the first day, it would produce an initial network exactly the same if only 20% of the observations were from the first day.
 
-### RADES-Based Models
+### Correlated Extended Model
 
-These Bayesian network models are trained using 1200-code aircraft tracks or encounters between transponder-equipped (cooperative) aircraft. The training data for the extended models were processed tracks from aircraft equipped with mode [Mode 3A/C](https://en.wikipedia.org/wiki/Air_traffic_control_radar_beacon_system) transponders and observed by one of over 200 ground-based primary and secondary surveillance radars managed by the RADES. The following figure illustrates the maximum theoretical surveillance volume for each radar. Actual radar range varies based on a variety of factors, such as altitude and nearby terrain.
+These Bayesian network models are trained on observed encounters between transponder-equipped (cooperative) aircraft. The training data were processed pairs of tracks of aircraft equipped with mode [Mode 3A/C](https://en.wikipedia.org/wiki/Air_traffic_control_radar_beacon_system) transponders and observed by one of over 200 ground-based primary and secondary surveillance radars managed by the RADES. The following figure illustrates the maximum theoretical surveillance volume for each radar. Actual radar range varies based on a variety of factors, such as altitude and nearby terrain.
 
 <p align="center"> <img src="./doc/map-rades.png" alt="RADES coverage" height="300"> </p>
 
-There are two actively maintained models trained with RADES data and each model has been updated once to enable extended simulation times. The extended correlated model was trained from more than 500,000 flight hours from cooperative aircraft, and the extended uncorrelated from more than 290,000 flight hours of 1200-code aircraft. The correlated model is the only model that explicitly models two aircraft.
-
-The deprecated littoral models describe how aircraft behave in the littoral regions of the United States. This model has been deprecated by the extended v2.x RADES-based models.
+The extended correlated model was trained from more than 500,000 flight hours from cooperative aircraft, and the extended uncorrelated from more than 290,000 flight hours of 1200-code aircraft.
 
 Filename | Model | Description (Version) | Altitude Scope
 :---  | :---  | :---  | :---:  
 [cor_v1.txt](./model/cor_v1.txt) | correlated | Aircraft squawking a Mode 3A/C discrete code over the CONUS (v1.1) | [1000, Inf]
 [cor_v2p1.txt](./model/cor_v2p1.txt) | correlated | Aircraft squawking a Mode 3A/C discrete code (v2.1) | [1000, Inf]
+[littoral_cor_v1.txt](./model/littoral_cor_v1.txt) (deprecated) | uncorrelated | Aircraft squawking a Mode 3A/C discrete code over littoral regions (v1.0)  | [1000, 45000]
+
+### Uncorrelated Conventional Aircraft
+
+Uncorrelated models assume aircraft behavior is not dependent on air traffic services or nearby aircraft. While trained using observations of cooperative aircraft equipped with transponders, they are often used as surrogates to model noncooperative aircraft not equipped with transponders.
+
+#### RADES-Based
+
+These Bayesian network models are trained using observations of 1200-code aircraft equipped with [Mode 3A/C](https://en.wikipedia.org/wiki/Air_traffic_control_radar_beacon_system) transponders and observed by a radar managed by the RADES. The training dataset was sourced from the same radars as the [correlated extended model](#correlated-extended-model). The extended uncorrelated was trained from more than 290,000 flight hours of 1200-code aircraft.
+
+Filename | Model | Description (Version) | Altitude Scope
+:---  | :---  | :---  | :---:  
 [uncor_1200_code_v1.txt](./model/uncor_1200code_v1.txt) | uncorrelated | Aircraft squawking Mode 3A/C of 1200 over the CONUS (v1.0) <br> Surrogate for conventional aircraft without transponders | [500, 18000]
 [uncor_1200_code_v2p1.txt](./model/uncor_1200code_v2p1.txt) | uncorrelated | Aircraft squawking Mode 3A/C of 1200 (v2.x) <br> Surrogate for conventional aircraft without transponders | [500, 18000]
 [littoral_uncor_v1.txt](./model/littoral_uncor_v1.txt) (deprecated) | correlated | Aircraft squawking Mode 3A/C of 1200 over littoral regions (v1.0) | [500, 18000]
-[littoral_cor_v1.txt](./model/littoral_cor_v1.txt) (deprecated) | uncorrelated | Aircraft squawking a Mode 3A/C discrete code over littoral regions (v1.0)  | [1000, 45000]
 
-### OpenSky Network-Based Models
+#### OpenSky Network-Based
 
 These Bayesian network models are trained from observations by the [OpenSky Network](https://github.com/openskynetwork) of [ADS-B](https://www.faa.gov/nextgen/programs/adsb/) equipped aircraft. The OpenSky Network collects data via a worldwide network of crowdsourced receivers of ADS-B, an operational surveillance technology for tracking aircraft. The network, started in 2012 with 12 European sensors, has grown to over a thousand worldwide active sensors. ADS-B equipped aircraft automatically self-report their position to ground stations and other equipped aircraft. Also the annual national aircraft registries of the United States, Canada, Ireland, and the Netherlands were used to identify aircraft type based on the Mode S ICAO24 address from the ADS-B data.
 
@@ -116,7 +125,7 @@ Version 1.2 of these models were trained from observations for 104 Mondays acros
 
 <p align="center"> <img src="./doc/map-osn-v1p2.png" alt="Geographic bounds for version 1.2 of the OpenSky models" height="300"> </p>
 
-These models use the same directed acyclic graph as the [RADES-based](#rades-based-models) uncorrelated 1200-code model. The initial network was slightly modified by adding a lower altitude bin of [50, 500] feet AGL and changing the highest altitude bin to [3000, 5000] feet AGL. Similar to the RADES-based 1200-code model, transponder [Mode 3A/C](https://en.wikipedia.org/wiki/Air_traffic_control_radar_beacon_system) filtering was completed when training these models. Refer to this [AIAA journal article](https://doi.org/10.2514/1.D0254) for guidance on which models can be surrogates for aircraft not equipped with ADS-B.
+These models use the same directed acyclic graph as the [RADES-based](#rades-based) uncorrelated 1200-code model. The initial network was slightly modified by adding a lower altitude bin of [50, 500] feet AGL and changing the highest altitude bin to [3000, 5000] feet AGL. Similar to the RADES-based 1200-code model, transponder [Mode 3A/C](https://en.wikipedia.org/wiki/Air_traffic_control_radar_beacon_system) filtering was completed when training these models. Refer to this [AIAA journal article](https://doi.org/10.2514/1.D0254) for guidance on which models can be surrogates for aircraft not equipped with ADS-B.
 
 Filename | Model | Description (Version) | Altitude Scope
 :---  | :---  | :---  | :---:  
@@ -130,9 +139,9 @@ Filename | Model | Description (Version) | Altitude Scope
 [uncor_allcode_fwsingle_v1.txt](./model/uncor_allcode_fwsingle_v1.txt) (deprecated) | uncorrelated | Fixed wing single-engine with ADS-B Out (v1.0) | [50, 5000]
 [uncor_allcode_rotorcraft_v1.txt](./model/uncor_allcode_rotorcraft_v1.txt) (deprecated) | uncorrelated | Rotorcraft with ADS-B Out (v1.0) | [50, 5000]
 
-### GPS-Based Unconventional Model
+### GPS-Based Uncorrelated Unconventional Aircraft Models
 
-This set of models were trained using more than 96,000 global unconventional aircraft tracks. Training data was sourced from multiple continents but the trained model does not include a geographic variable. These models were developed developed in response to the [RADES-based](#rades-based-models) 1200-code model not being sufficiently representative all types of noncooperative aircraft.
+This set of models were trained using more than 96,000 global unconventional aircraft tracks. Training data was sourced from multiple continents but the trained model does not include a geographic variable. These models were developed developed in response to the [RADES-based](#rades-based) 1200-code model not being sufficiently representative all types of noncooperative aircraft.
 
 <p align="center"> <img src="./doc/map-unconv-western.png" height="300">  <img src="./doc/map-unconv-eastern.png" height="300"> </p>
 
@@ -174,9 +183,11 @@ Filename | Model | Description (Version) | Altitude Scope
 
 ### Correlated Terminal Model
 
-A set of Bayesian networks tailored to address structured terminal operations, i.e., correlations between trajectories and the airfield and each other. The model is comprised to two main elements. The first component, the encounter geometry model, describes the geometrical conditions of two encounter aircraft at their point of closest approach. The second component, the trajectory generation model, then describes the flight path for each aircraft leading to and continuing from their point of closest approach.
+*This model is in active development, with significant updates and additional documentation expected through 2022.*
 
-This model is unique in that it is one of the few correlated models and the only to have a separate encounter geometry model. The [RADES-based correlated model](#rades-based-models) has a single dynamic Bayesian network that captures both the relative geometry of the two aircraft and the dynamic states of each aircraft. The terminal model differs in that the relative geometry at CPA is modeled by the encounter geometry model and the dynamics of each aircraft are represented by aircraft trajectory models. There is a different trajectory model for each aircraft (ownship and intruder), with similar model structures. Furthermore these models were trained based on encounters where ownship was executing a straight-in landing or straight-out takeoff. There was no such restrictions on the intruder.
+A set of Bayesian networks tailored to address structured terminal operations, i.e., correlations between trajectories and the airfield and each other. It was specifically trained to support [RTCA SC-228](https://www.rtca.org/sc-228/) development of the [DO-365](https://my.rtca.org/nc__store?search=do-365) minimum operational performance standard (MOPS). The model is comprised to two main elements. The first component, the encounter geometry model, describes the geometrical conditions of two encounter aircraft at their point of closest approach. The second component, the trajectory generation model, then describes the flight path for each aircraft leading to and continuing from their point of closest approach.
+
+This model is unique in that it is one of the few correlated models and the only to have a separate encounter geometry model. The correlated extended model has a single dynamic Bayesian network that captures both the relative geometry of the two aircraft and the dynamic states of each aircraft. The terminal model differs in that the relative geometry at CPA is modeled by the encounter geometry model and the dynamics of each aircraft are represented by aircraft trajectory models. There is a different trajectory model for each aircraft (ownship and intruder), with similar model structures. Furthermore these models were trained based on encounters where ownship was executing a straight-in landing or straight-out takeoff. There was no such restrictions on the intruder.
 
 Encounter Geometry Model | Aircraft Trajectory Models
 :---:  | :---:  
@@ -184,9 +195,10 @@ Encounter Geometry Model | Aircraft Trajectory Models
 
 Two variants of this model have been trained. While the model structure is the same between the variants, different datasets were used for training. These two datasets were 1) FAA terminal radar track data over the period January through September 2015 throughout the NAS and 2) 190+ days of data over the period January 2019 through February 2020 from the OpenSky Network. These two sources of data have different assumptions and surveil different types of aircraft. Training multiple models enabled assessments of the sensitivity of the models to different biases; while mitigating some weakness for a given dataset.
 
-The Bayesian model has recently been made available but please contract the admins regarding access to the MATLAB code to sample the models to create encounters. The sampling software should be available later this year. Additionally, a dataset of samples from an early prototype of the model is hosted on the MIT LL external website. You can access the dataset [here](https://www.ll.mit.edu/r-d/datasets/unmanned-aircraft-terminal-area-encounters).
-
-*This model is in active development, with significant updates and additional documentation expected in 2021.*
+Data source | Model | Description (Version) | Altitude Scope
+:---  | :---  | :---  | :---:  
+[OpenSky Network-based](./model/correlated_terminal/opensky/README.md) | correlated | Encounters near aerodromes observed by the OpenSky Network | [200, 5000]
+[Terminal area radar](./model/correlated_terminal/terminalradar/README.md) | correlated | Encounters near aerodromes observed by terminal area radars | [200, 5000]
 
 ## Common Categorical Variables
 
@@ -204,7 +216,7 @@ Aircraft behavior may vary across different geographic regions due to varying we
 | 4 | Offshore of Islands
 | 5 | Mainland Canada (*recently introduced in v1.2 of the OpenSky Network models*)
 
-The following figures illustrates the onshore geographic domains for version 1.2 of the [OpenSky Network-based models](#opensky-network-based-models). Note that the version 1.2 models are the first models to include Canada as a distinct geographic domain. Additional research is required to determine if modeled aircraft behavior is statistically different between the Canadian and contiguous United States geographic domains. Also, version 1.0 of the [OpenSky Network-based models](#opensky-network-based-models) and the [RADES-based models](#rades-based-models) each calculated the geographic domain variable slightly differently.
+The following figures illustrates the onshore geographic domains for version 1.2 of the uncorrelated [OpenSky Network-based models](#opensky-network-based-models). Note that the version 1.2 uncorrelated models are the first models to include Canada as a distinct geographic domain. Additional research is required to determine if modeled aircraft behavior is statistically different between the Canadian and contiguous United States geographic domains. Also, version 1.0 of the OpenSky Network-based models and the RADES-based models each calculated the geographic domain variable slightly differently.
 
 <p align="center"> <img src="./doc/map-osn-g1.png" width="400">  <img src="./doc/map-osn-g5.png" width="400"> </p>
 <p align="center"> <img src="./doc/map-osn-g2_1.png" width="400">  <img src="./doc/map-osn-g2_2.png" width="400"> </p>
@@ -224,15 +236,15 @@ This variable was incorporated into the models to account for the variation in h
 
 ### Are these models location specific?
 
-The models describe the behavior of aircraft across large geographic regions, such as the CONUS, and are not specific to smaller regions, such as New York City. When developing the initial v1.x [RADES-based models](#rades-based-models), it was assessed and determined there was not a significant statistical difference in aircraft behavior between operations Los Angeles and New York. When developing the v2.x [RADES-based models](#rades-based-models), the dependence of aircraft behavior on location was reassessed. It was determined that behavior was dependent on geographic features, such as if an aircraft was operating over the ocean or the CONUS.
+The models describe the behavior of aircraft across large geographic regions, such as the CONUS, and are not specific to smaller regions, such as New York City. When developing the initial v1.x [RADES-based models](#rades-based), it was assessed and determined there was not a significant statistical difference in aircraft behavior between operations Los Angeles and New York. When developing the v2.x [RADES-based models](#rades-based), the dependence of aircraft behavior on location was reassessed. It was determined that behavior was dependent on geographic features, such as if an aircraft was operating over the ocean or the CONUS.
 
 ### Does sampling the models create a complete encounter between aircraft?
 
-No, with the exception of the [RADES-based models](#rades-based-models) correlated model, model samples can be used to create individual and independent aircraft tracks. For an uncorrelated encounter, a single aircraft trajectory is sampled from an encounter model which is paired with a different, separately sampled trajectory to create one encounter. A collection of encounters, often used for Monte Carlo simulations, are referred to as an encounter set. For correlated encounters, both aircraft are sampled together from the same encounter model. These independent tracks need to be paired together to create an encounter.
+No, with the exception of the [RADES-based models](#rades-based) correlated model, model samples can be used to create individual and independent aircraft tracks. For an uncorrelated encounter, a single aircraft trajectory is sampled from an encounter model which is paired with a different, separately sampled trajectory to create one encounter. A collection of encounters, often used for Monte Carlo simulations, are referred to as an encounter set. For correlated encounters, both aircraft are sampled together from the same encounter model. These independent tracks need to be paired together to create an encounter.
 
 ### How do I create tracks with initial altitudes outside a model's altitude scope?
 
-It is strongly recommended against using the models to assess aircraft behavior outside the prescribed altitude scope. The model scope is based on the altitudes of the aircraft observations used to train the models. For example, the [RADES-based model](#rades-based-models) 1200-code model was trained using observations of aircraft at 500 feet AGL or above. Since this model was not trained with observations at lower altitudes, it may not be representative of aircraft flying below 500 feet AGL. We do not provide any supporting material to justify that the models are representative of aircraft behavior outside their prescribed altitude scope.
+It is strongly recommended against using the models to assess aircraft behavior outside the prescribed altitude scope. The model scope is based on the altitudes of the aircraft observations used to train the models. For example, the [RADES-based model](#rades-based) 1200-code model was trained using observations of aircraft at 500 feet AGL or above. Since this model was not trained with observations at lower altitudes, it may not be representative of aircraft flying below 500 feet AGL. We do not provide any supporting material to justify that the models are representative of aircraft behavior outside their prescribed altitude scope.
 
 ### Do the models account for traffic density?
 
