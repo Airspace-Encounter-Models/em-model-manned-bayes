@@ -12,43 +12,43 @@ addRequired(p,'initial_filename');
 addRequired(p,'transition_filename');
 
 % Optional
-addOptional(p,'num_max_tracks',10000,@isnumeric);
+addParameter(p,'num_max_tracks',10000,@isnumeric);
 
 % Optional - Output Directory
-addOptional(p,'out_dir_parent',[getenv('AEM_DIR_BAYES') filesep 'output' filesep 'tracks']);
+addParameter(p,'out_dir_parent',[getenv('AEM_DIR_BAYES') filesep 'output' filesep 'tracks']);
 
 % Optional - Initial
 % These need to align with parameters.labels_initial
 % Note that not all models may have these variables / labels
 % These labels can be calculated via:
 % matlab.lang.makeValidName(erase(parameters.labels_initial,{'"','\'}));
-addOptional(p,'label_initial_geographic','G');
-addOptional(p,'label_initial_airspace','A');
-addOptional(p,'label_initial_altitude','L');
-addOptional(p,'label_initial_speed','v');
-addOptional(p,'label_initial_acceleration','dotV');
-addOptional(p,'label_initial_vertrate','dotH');
-addOptional(p,'label_initial_turnrate','dotPsi');
+addParameter(p,'label_initial_geographic','G');
+addParameter(p,'label_initial_airspace','A');
+addParameter(p,'label_initial_altitude','L');
+addParameter(p,'label_initial_speed','v');
+addParameter(p,'label_initial_acceleration','dotV');
+addParameter(p,'label_initial_vertrate','dotH');
+addParameter(p,'label_initial_turnrate','dotPsi');
 
 % Optional - Transition
 % These need to align with parameters.labels_transition
 % Note that not all models may have these variables / labels
 % These labels can be calculated via:
 % matlab.lang.makeValidName(erase(parameters.labels_transition(parameters.temporal_map(:,2)),{'"','\'}))
-addOptional(p,'label_transition_speed','dotV_t_1_'); % \dot v(t+1)
-addOptional(p,'label_transition_altitude','dotH_t_1_'); % \dot h(t+1)
-addOptional(p,'label_transition_heading','dotPsi_t_1_' ); % \dot \psi(t+1)
+addParameter(p,'label_transition_speed','dotV_t_1_'); % \dot v(t+1)
+addParameter(p,'label_transition_altitude','dotH_t_1_'); % \dot h(t+1)
+addParameter(p,'label_transition_heading','dotPsi_t_1_' ); % \dot \psi(t+1)
 
 % Optional - Boundaries
-addOptional(p,'isOverwriteZeroBoundaries',false,@islogical); % If true
-addOptional(p,'idxZeroBoundaries',[1 2 3], @isnumeric); % Index of parameters.boundaries to force to be zero / empty
+addParameter(p,'isOverwriteZeroBoundaries',false,@islogical); % If true
+addParameter(p,'idxZeroBoundaries',[1 2 3], @isnumeric); % Index of parameters.boundaries to force to be zero / empty
 
 % Optional - Rejection Sampling
-addOptional(p,'min_altitude_ft',0, @isnumeric);
+addParameter(p,'min_altitude_ft',0, @isnumeric);
 
 % Optional
-addOptional(p,'rng_seed',42,@isnumeric); % Random seed
-addOptional(p,'isPlot',false,@islogical);
+addParameter(p,'rng_seed',42,@isnumeric); % Random seed
+addParameter(p,'isPlot',false,@islogical);
 
 % Parse
 parse(p,parameters_filename,initial_filename,transition_filename,varargin{:});
@@ -60,8 +60,8 @@ rng(p.Results.rng_seed,'twister');
 % Parameters
 parameters = em_read(parameters_filename,'isOverwriteZeroBoundaries',p.Results.isOverwriteZeroBoundaries,'idxZeroBoundaries',p.Results.idxZeroBoundaries);
 
-labels_init = matlab.lang.makeValidName(erase(parameters.labels_initial,{'"','\'}));
-labels_trans = matlab.lang.makeValidName(erase(parameters.labels_transition(parameters.temporal_map(:,2)),{'"','\'}));
+labels_init = matlab.lang.makeValidName(erase(parameters.labels_initial,{'"','\'}))';
+labels_trans = matlab.lang.makeValidName(erase(parameters.labels_transition(parameters.temporal_map(:,2)),{'"','\'}))';
 
 % Initial
 T_initial = readtable(initial_filename,'Delimiter',' ','HeaderLines',1,'EndOfLine','\n');
@@ -159,7 +159,7 @@ if L(1) < 0; L(1) = 0; end
 if ~isempty(strfind(pfn{end},'uncor_'))
         G = unique(T_initial.(idx_initial_geographic));
         A = unique(T_initial.(idx_initial_airspace));
-        GAL = combvec(G',A',L')';
+       GAL = allcomb(G,A,L);
         for i=1:1:size(GAL,1)
             iDir = [p.Results.out_dir_parent filesep sprintf('G%i',GAL(i,1)) filesep sprintf('A%i',GAL(i,2)) filesep sprintf('%ift',GAL(i,3))];
             if exist(iDir,'dir') ~=7; mkdir(iDir);end

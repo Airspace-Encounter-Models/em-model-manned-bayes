@@ -7,6 +7,36 @@ and this project should adhere to [Semantic Versioning](https://semver.org/spec/
 
 ## [Unreleased]
 
+### Added
+
+### Changed
+
+### Removed
+
+### Fixed
+
+## [2.0.0] - 2021-10-01
+
+### Added
+
+- Classdef for `EncounterModel` superclass and `UncorEncounterModel` class
+- `RUN_OOP` is an example RUN script demonstrating how to use the new `UncorEncounterModel` class
+- `IdentifyGeographicVariable` to calculate the geographic domain variable, G
+
+### Changed
+
+- Update `EncounterModelEvents` with property validation functions
+- Update `em_read` to calculate `bounds_initial` and `cutpoints_inital`
+- Startup script add `em-core` to path
+- Various functions updated to use `addParameter` instead of `addOptional` when using the MATLAB input parser
+- `.gitignore` updated to ignore .png files in the output directory
+
+### Removed
+
+### Fixed
+
+- End of line whitespace in ASCII files for boundaries parameters had extra whitespace leading to incorrect reading of data by `em_read`. This bug was introduced in 1.4.0 and previous versions were note effected.
+
 ## [1.4.0] - 2021-07-19
 
 ### Added
@@ -16,10 +46,11 @@ and this project should adhere to [Semantic Versioning](https://semver.org/spec/
 ### Changed
 
 - Completely rewrote `em_read` so it no longer assumes a strict model structure with a specific set of model fields organized in a specific order
-- Changed inputs to `em_sample`, `dbn_sample`, `dbn_hierarchical_sample` to be a struct of model parameters instead of individual parameters. This improves flexibility and readability.
-- `em_read` now calls `bn_sort` and calculates variable order for initial and transition networks. Calculating these upfront significantly improves performance because bn_sort was a bottleneck.
+- Changed inputs to `em_sample`, `dbn_sample`, `dbn_hierarchical_sample` to be a struct of model parameters instead of individual parameters. This improves flexibility and readability
+- `em_read` now calls `bn_sort` and calculates variable order for initial and transition networks. Calculating these upfront significantly improves performance because bn_sort was a bottleneck
 - Reorganized `dbn_sample` to minimize repeat function calls and calculations
-- `dbn_sample` now longer calls select_random because it was inefficiently adding overhead due to the multiple calls to rand and cumsum. This wasn't inefficient because `cumsum(weights)` don't change for the dynamic variables
+- `dbn_sample` now longer calls select_random because it was inefficiently adding overhead due to the multiple calls to `rand` and `cumsum`. This wasn't inefficient because `cumsum(weights)` don't change for the dynamic variables
+- Since `allcomb` was added to em-core, `sample2track` now uses `allcomb` instead of `combvec`, which removes a dependency on the MATLAB Deep Learning Toolbox
 - More documentation on the terminal encounter model
 
 ### Fixed
@@ -45,7 +76,7 @@ and this project should adhere to [Semantic Versioning](https://semver.org/spec/
 
 ### Added
 
-- Optional inputs to `em_read` to overwrite zero bounadries for a model
+- Optional inputs to `em_read` to overwrite zero boundaries for a model
 
 ### Changed
 

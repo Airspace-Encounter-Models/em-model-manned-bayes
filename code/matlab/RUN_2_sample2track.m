@@ -17,12 +17,6 @@ transition_base =  [inDir filesep model '_transition'];
 n_tracks = zeros(num_files,1);
 run_time_s = zeros(num_files,1);
 
-%% Warn about Matlab toolbox
-product_info = ver;
-if ~any(strcmpi({product_info.Name},'Deep Learning Toolbox')) && ~any(strcmpi({product_info.Name},'Neural Network Toolbox'))
-    warning('toolbox:combvec',sprintf('sample2track() uses combvec(), a function from the MATLAB Deep Learning or Neural Network Toolbox\nAn alternative is to use allcomb from file exchange:https://www.mathworks.com/matlabcentral/fileexchange/10064-allcomb-varargin\nReplace GAL = combvec(G'',A'',L'')''; with GAL = allcomb(G,A,L);''\n'));
-end
-
 %% Iterate and Execute
 parfor i=1:1:num_files
     tic;

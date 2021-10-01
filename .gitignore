@@ -1,6 +1,7 @@
 # Output
 output/**/*.txt
 output/**/*.csv
+output/**/*.png
 
 # MATLAB
 # Windows default autosave extension

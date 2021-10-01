@@ -38,8 +38,8 @@ addRequired(p,'parameters_filename'); % text specifying the name of the paramete
 % This behavior is controlled by the boundaries parameter.
 % If in the parameter file, it is listed as `*`, it will return just the index (e.g. 2).
 % If there are values, such as `50 500 1200 3000 5000,` it will return a value (e.g. 650).
-addOptional(p,'isOverwriteZeroBoundaries',false,@islogical); % If true, use idxZeroBoundaries to force the return of a bin index for variables = idxZeroBoundaries
-addOptional(p,'idxZeroBoundaries',[1 2 3], @isnumeric); % Index of parameters.boundaries that will return a bin index (e.g. 1) when sampled instead of a numeric value (e.g. 50) (The default of [1 2 3] is for most uncor, 1=G,2=A,3=L)
+addParameter(p,'isOverwriteZeroBoundaries',false,@islogical); % If true, use idxZeroBoundaries to force the return of a bin index for variables = idxZeroBoundaries
+addParameter(p,'idxZeroBoundaries',[1 2 3], @isnumeric); % Index of parameters.boundaries that will return a bin index (e.g. 1) when sampled instead of a numeric value (e.g. 50) (The default of [1 2 3] is for most uncor, 1=G,2=A,3=L)
 
 % Parse
 parse(p,parameters_filename,varargin{:});
@@ -111,7 +111,7 @@ if any(strcmp(fields,'# labels_transition'))
     parms.temporal_map = extract_temporal_map(parms.labels_transition);
 end
 
-%% Extract zero bins
+%% Extract zero bins & calculate  bounds_initial and cutpoints_initial
 if any(strcmp(fields,'# boundaries'))
     parms.zero_bins = extract_zero_bins(parms.boundaries);
     
@@ -119,6 +119,25 @@ if any(strcmp(fields,'# boundaries'))
     if p.Results.isOverwriteZeroBoundaries
         parms.boundaries(p.Results.idxZeroBoundaries) = repmat({double.empty(0,1)},size(p.Results.idxZeroBoundaries));
     end
+    
+    % Preallocate bounds_initial and cutpoints_initial
+    bounds_initial = zeros(parms.n_initial,2);
+    cutpoints_initial = cell(1,parms.n_initial);
+    
+    % Iterate over initial network variables
+    for ii=1:1:parms.n_initial
+        if isempty(parms.boundaries{ii})
+            n = size(parms.N_initial{ii},1);
+            cutpoints_initial{ii} = 2:1:n;
+        else
+            bounds_initial(ii,1:2) = [min(parms.boundaries{ii}) max(parms.boundaries{ii})];
+            cutpoints_initial{ii} = parms.boundaries{ii}(2:end-1)';
+        end
+    end
+    
+    % Assign
+    parms.bounds_initial = bounds_initial;
+    parms.cutpoints_initial = cutpoints_initial;
 end
 
 function zero_bins = extract_zero_bins(boundaries)

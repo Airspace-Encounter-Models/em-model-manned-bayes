@@ -1,4 +1,4 @@
-function [initial, events] = dbn_hierarchical_sample(parms, dirichlet_initial, dirichlet_transition, sample_time, dediscretize_parameters, zero_bins, resample_rates, initial)
+function [initial, events] = dbn_hierarchical_sample(parms, dirichlet_initial, dirichlet_transition, sample_time, dediscretize_parameters, zero_bins, resample_rates, start)
 % Copyright 2008 - 2021, MIT Lincoln Laboratory
 % SPDX-License-Identifier: BSD-2-Clause
 % DBN_HIERARCHICAL_SAMPLE Calls dbn_sample() to generate samples from a
@@ -9,7 +9,7 @@ function [initial, events] = dbn_hierarchical_sample(parms, dirichlet_initial, d
 if nargin < 8
     [initial, events] = dbn_sample(parms, dirichlet_initial, dirichlet_transition, sample_time);
 else
-    [initial, events] = dbn_sample(parms, dirichlet_initial, dirichlet_transition, sample_time, initial);
+    [initial, events] = dbn_sample(parms, dirichlet_initial, dirichlet_transition, sample_time, start);
 end    
 
 if isempty(events)

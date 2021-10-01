@@ -20,20 +20,20 @@ p = inputParser;
 addRequired(p,'parameters_filename'); % text specifying the name of the parameters file
 
 % Optional - Model
-addOptional(p,'initial_output_filename',[getenv('AEM_DIR_BAYES') filesep 'output' filesep 'initial.txt']);
-addOptional(p,'transition_output_filename',[getenv('AEM_DIR_BAYES') filesep 'output' filesep 'transition.txt']);
-addOptional(p,'num_initial_samples',100,@isnumeric);
-addOptional(p,'num_transition_samples',60,@isnumeric);
+addParameter(p,'initial_output_filename',[getenv('AEM_DIR_BAYES') filesep 'output' filesep 'initial.txt']);
+addParameter(p,'transition_output_filename',[getenv('AEM_DIR_BAYES') filesep 'output' filesep 'transition.txt']);
+addParameter(p,'num_initial_samples',100,@isnumeric);
+addParameter(p,'num_transition_samples',60,@isnumeric);
 
 % Optional - Sampling
-addOptional(p,'start',{},@iscell);
+addParameter(p,'start',{},@iscell);
 
 % Optional - Boundaries
-addOptional(p,'isOverwriteZeroBoundaries',false,@islogical); % If true, sample bins index and not produce a sampled value
-addOptional(p,'idxZeroBoundaries',[1 2 3], @isnumeric); % Index of parameters.boundaries to force to be zero / empty
+addParameter(p,'isOverwriteZeroBoundaries',false,@islogical); % If true, sample bins index and not produce a sampled value
+addParameter(p,'idxZeroBoundaries',[1 2 3], @isnumeric); % Index of parameters.boundaries to force to be zero / empty
 
 % Optional
-addOptional(p,'rng_seed',42,@isnumeric); % Random seed
+addParameter(p,'rng_seed',42,@isnumeric); % Random seed
 
 % Parse
 parse(p,parameters_filename,varargin{:});
@@ -43,20 +43,16 @@ rng(p.Results.rng_seed,'twister');
 
 %% Read and create priors
 % read parameters
-parameters = em_read(parameters_filename,...
+parms = EncounterModel('parameters_filename',parameters_filename,...
     'isOverwriteZeroBoundaries',p.Results.isOverwriteZeroBoundaries,'idxZeroBoundaries',p.Results.idxZeroBoundaries);
 
 % create priors
-dirichlet_initial = bn_dirichlet_prior(parameters.N_initial);
-dirichlet_transition = bn_dirichlet_prior(parameters.N_transition);
+parms.prior = 'constant';
 
-% 
-if any(strcmp(p.UsingDefaults,'start'))
-    start = cell(1,length(parameters.N_initial));
-else
-    start = p.Results.start;
+% Update start if specified by user
+if ~any(strcmp(p.UsingDefaults,'start'))
+    parms.start = p.Results.start;
 end
-
 
 %% Create output files and create headers
 % Open output files
@@ -65,15 +61,15 @@ f_transition = fopen(p.Results.transition_output_filename, 'w','native','UTF-8')
 
 % print initial headers
 fprintf(f_initial, 'id ');
-for i = 1:parameters.n_initial
-    fprintf(f_initial, '%s ', parameters.labels_initial{i});
+for i = 1:parms.n_initial
+    fprintf(f_initial, '%s ', parms.labels_initial{i});
 end
 fprintf(f_initial, '\n');
 
 % print transition headers
 fprintf(f_transition, 'initial_id t ');
-for i = 1:(parameters.n_transition - parameters.n_initial)
-    fprintf(f_transition, '%s ', parameters.labels_transition{parameters.temporal_map(i,2)});
+for i = 1:(parms.n_transition - parms.n_initial)
+    fprintf(f_transition, '%s ', parms.labels_transition{parms.temporal_map(i,2)});
 end
 fprintf(f_transition, '\n');
 
@@ -81,19 +77,24 @@ fprintf(f_transition, '\n');
 % Iterate
 for i = 1:p.Results.num_initial_samples
     % Create sample
-    [x, ~, ~] = create_sample(parameters, dirichlet_initial, dirichlet_transition, p.Results.num_transition_samples, start);
+    sample_time = p.Results.num_transition_samples;
+    [initial, events] = dbn_hierarchical_sample(parms, parms.dirichlet_initial, parms.dirichlet_transition, ...
+        sample_time, parms.boundaries, parms.zero_bins, parms.resample_rates, parms.start);
+    
+    % Convert to samples
+    samples = events2samples(initial, events);
     
     % print initial sample
     fprintf(f_initial, '%d ', i);
-    fprintf(f_initial, '%g ', x(1:end-1,1));
-    fprintf(f_initial, '%g', x(end,1));
+    fprintf(f_initial, '%g ', samples(1:end-1,1));
+    fprintf(f_initial, '%g', samples(end,1));
     fprintf(f_initial, '\n');
     
     % print transition samples
     for j = 1:p.Results.num_transition_samples
         fprintf(f_transition, '%g %g ', i, j - 1);
-        fprintf(f_transition, '%g ', x(parameters.temporal_map(1:end-1,1), j));
-        fprintf(f_transition, '%g', x(parameters.temporal_map(end,1), j));
+        fprintf(f_transition, '%g ', samples(parms.temporal_map(1:end-1,1), j));
+        fprintf(f_transition, '%g', samples(parms.temporal_map(end,1), j));
         fprintf(f_transition, '\n');
     end
 end
@@ -102,36 +103,3 @@ end
 fclose(f_initial);
 fclose(f_transition);
 
-function alpha = bn_dirichlet_prior(N)
-n = length(N);
-alpha = cell(n, 1);
-for i = 1:n
-    [r, q] = size(N{i});
-    alpha{i} = ones(r, q);
-end
-
-function [x, initial, events] = create_sample(parms, dirichlet_initial, dirichlet_transition, sample_time, start)
-% Sample model
-[initial, events] = dbn_sample(parms, dirichlet_initial, dirichlet_transition, sample_time, start);
-if isempty(events)
-    events = [sample_time 0 0];
-else
-    events = [events; sample_time - sum(events(:,1)) 0 0];
-end
-
-% Within-bin resampling
-events = resample_events(initial, events, parms.resample_rates);
-
-% Dediscretize
-for i = 1:numel(initial)
-    if isempty(parms.boundaries{i})
-    else
-        initial(i) = dediscretize(initial(i), parms.boundaries{i}, parms.zero_bins{i});
-    end
-end
-if ~isempty(events)
-    for i = 1:(size(events,1)-1)
-        events(i,3) = dediscretize(events(i,3), parms.boundaries{events(i,2)}, parms.zero_bins{events(i,2)});
-    end
-end
-x = events2samples(initial, events);
