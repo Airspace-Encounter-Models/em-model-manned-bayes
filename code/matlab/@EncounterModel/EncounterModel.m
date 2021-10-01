@@ -72,6 +72,10 @@ classdef EncounterModel < handle
     %% Constructor Function and Helpers
     methods
         function obj = EncounterModel(varargin)
+            % Instantiates an object by reading in an encounter model
+            % parameters from an ASCII file
+            %
+            % SEE ALSO em_read
             
             obj.isAutoUpdate = false;
             

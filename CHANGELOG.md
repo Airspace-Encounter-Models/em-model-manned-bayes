@@ -11,6 +11,20 @@ and this project should adhere to [Semantic Versioning](https://semver.org/spec/
 
 ### Changed
 
+### Removed
+
+### Fixed
+
+## [2.1.0] - 2021-10-01
+
+### Added
+
+- Classdef for `CorTerminalModel`
+- `RUN_terminal` is an example RUN script demonstrating how to use the new `CorTerminalModel` class
+- `aind2sub`, `discretize_bayes`, `hierarchical_discretize`, `setTransitionPriors` are various functions to help sample the Bayesian networks
+
+### Changed
+
 - `RUN_OOP` renamed to `RUN_uncor`
 - Update primary `README.md` with information about the correlated terminal model and to better distinguish it from the RADES-based correlated extended model
 - `UncorEncounterModel/track` sets minimum and maximum speed thresholds for rejection sampling based on the probability distribution of the speed bins, rather than the minimum and maximum speeds of the model structure. In release [2.0.0], the conventional uncorrelated models released in [1.3.0] had a maximum speed of 300 knots with a minimum speed of at least 30 knots for the fixed-wing models. The speed ranges for the different uncorrelated models are now the following:
@@ -20,10 +34,6 @@ and this project should adhere to [Semantic Versioning](https://semver.org/spec/
 | Fixed-Wing Multi-Engine | [120, 300] | [90, 300] |
 | Fixed-Wing Single Engine | [60, 250] | [60, 250] |
 | Rotorcraft | [30, 165] | [30, 165]
-
-### Removed
-
-### Fixed
 
 ## [2.0.0] - 2021-10-01
 

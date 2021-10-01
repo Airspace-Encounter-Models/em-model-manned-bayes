@@ -1,6 +1,7 @@
 function [G,latCA_deg,lonCA_deg,latUS_deg,lonUS_deg,latIslands_deg,lonIslands_deg,boundCaribbean_lat_deg,boundCaribbean_lon_deg,boundHI_lat_deg,boundHI_lon_deg] = IdentifyGeographicVariable(lat_deg,lon_deg,varargin);
 % Copyright 2008 - 2021, MIT Lincoln Laboratory
 % SPDX-License-Identifier: BSD-2-Clause
+% Identifies the geographic domain for latitude, longitude coordinates
 
 %% Input parser
 % Create input parser
