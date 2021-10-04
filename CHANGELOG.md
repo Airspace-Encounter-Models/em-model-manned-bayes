@@ -11,7 +11,11 @@ and this project should adhere to [Semantic Versioning](https://semver.org/spec/
 
 ### Changed
 
+- Check for MATLAB version in `startup_bayes` and mapping toolbox in `UncorEncounterModel` constructor. These updates are in response to when creating geodetic tracks with `UncorEncounterModel/track`, as `readgeoraster` is called as within `msl2agl`.  `readgeoraster` was introduced as part of the MATLAB mapping toolbox in 2020a.
+
 ### Removed
+
+- Property validation functions no longer use `mustBeVector`, whic was introduced in 2020b and limits tech transfer
 
 ### Fixed
 

@@ -12,3 +12,8 @@ if isempty(getenv('AEM_DIR_CORE'))
 else
     addpath(genpath([getenv('AEM_DIR_CORE') filesep 'matlab']))    
 end
+
+%% Check for matlab version
+if verLessThan('matlab','9.8')
+    warning('Matlab version is less than R2020a (9.8), some code will not work. For example readgeoraster(), used when creating geodetic tracks with UncorEncounterModel/track, was introduced R2020a.');
+end
