@@ -15,6 +15,12 @@ classdef UncorEncounterModel < EncounterModel
     methods
         function obj = UncorEncounterModel(varargin)
             
+            % MathWorks Products
+            product_info = ver;
+            if ~any(strcmpi({product_info.Name},'Mapping Toolbox'))
+                warning('toolbox:mapping',sprintf('Mapping Toolbox not found: UncorEncounterModel/track use various functions from this toolbox.\n'));
+            end
+            
             % Input parser
             p = inputParser;
             addParameter(p,'input_type','file');
@@ -426,7 +432,7 @@ classdef UncorEncounterModel < EncounterModel
                     
                     % Calculates speed and vertical rate limits based on
                     % encounter model distributions
-                    dynLims = obj. getDynamicLimits(initial,results,idxG,idxA,idxL,idxV,idxDH,isDiscretized);
+                    dynLims = obj.getDynamicLimits(initial,results,idxG,idxA,idxL,idxV,idxDH,isDiscretized);
                     
                     % Rejection sampling criteria
                     isViolateL = any(results.up_ft < minAlt_ft | results.up_ft > maxAlt_ft);
@@ -482,9 +488,5 @@ classdef UncorEncounterModel < EncounterModel
                 end
             end
         end
-        
-
-        
-        
     end   
 end % End class def
