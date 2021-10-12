@@ -4,8 +4,8 @@ classdef EncounterModel < handle
     %%
     properties (SetAccess=immutable, GetAccess=public)
         % Variable labels
-        labels_initial(1,:) cell {mustBeVector};
-        labels_transition(1,:) cell {mustBeVector};
+        labels_initial(1,:) cell {};
+        labels_transition(1,:) cell {};
         
         % maps variable at time t to same variable at time t+1 or t-1
         temporal_map(:,2) double {mustBeInteger, mustBeNonnegative, mustBeFinite};
@@ -18,8 +18,8 @@ classdef EncounterModel < handle
     properties (SetAccess=public, GetAccess=public)
         % Model cutpoints for each bound, bounds, and zero bins
         bounds_initial(:,2) double {mustBeReal, mustBeFinite};
-        cutpoints_initial(1,:) cell {mustBeVector};
-        boundaries(1,:) cell {mustBeVector};
+        cutpoints_initial(1,:) cell {};
+        boundaries(1,:) cell {};
         
         % Bin that discretized variable where we always sample zero
         % e.g. minor heading changes that are treated as no heading change
@@ -27,26 +27,26 @@ classdef EncounterModel < handle
         % between -0.25 (cutpoints_initial index #2) and 0.25
         % (cutpoints_initial index #3), so assume the dv observation
         % will be placed in the third bin of [-0.25, 0.25]
-        zero_bins(1,:) cell {mustBeVector};
+        zero_bins(1,:) cell {};
         
         % The number of columns in the N matrix is the product of the
         % number of bins in each parents
-        N_initial(:,1) cell {mustBeVector};
-        N_transition(:,1) cell {mustBeVector};
+        N_initial(:,1) cell {};
+        N_transition(:,1) cell {};
         
         % Resample rates
         % This is just preallocate, we learn this when training the model
         % hierarchical_discretize() learns this
         % WE DO NOT MANUALLY SET THIS
-        resample_rates(:,1) double {mustBeVector, mustBeReal, mustBeFinite};
+        resample_rates(:,1) double {mustBeReal, mustBeFinite};
         all_repeat(:,:) double {mustBeReal};
         all_change(:,:) double {mustBeReal};
         
         prior(1,:) {mustBeNonempty} = 0;
-        dirichlet_initial(:,1) cell {mustBeVector};
-        dirichlet_transition(:,1) cell {mustBeVector};
+        dirichlet_initial(:,1) cell {};
+        dirichlet_transition(:,1) cell {};
         
-        start(:,1) cell {mustBeVector};
+        start(:,1) cell {};
         
         isAutoUpdate(1,1) logical {mustBeNumericOrLogical}
     end
@@ -63,10 +63,10 @@ classdef EncounterModel < handle
         r_transition(:,1) double {mustBeReal};
         
         bounds_transition(:,2) double {mustBeReal, mustBeFinite};
-        cutpoints_transition(1,:) cell {mustBeVector};;
+        cutpoints_transition(1,:) cell {};;
         
-        cutpoints_fine(1,:) cell {mustBeVector};
-        dediscretize_parameters(1,:) cell {mustBeVector};
+        cutpoints_fine(1,:) cell {};
+        dediscretize_parameters(1,:) cell {};
     end
     
     %% Constructor Function and Helpers
