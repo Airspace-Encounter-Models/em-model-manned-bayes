@@ -9,13 +9,17 @@ and this project should adhere to [Semantic Versioning](https://semver.org/spec/
 
 ### Added
 
+- `.gitattributes` to manage end of lines and git settings
+
 ### Changed
 
 - Check for MATLAB version in `startup_bayes` and mapping toolbox in `UncorEncounterModel` constructor. These updates are in response to when creating geodetic tracks with `UncorEncounterModel/track`, as `readgeoraster` is called as within `msl2agl`.  `readgeoraster` was introduced as part of the MATLAB mapping toolbox in 2020a.
+- Style fixes for entire repository using [MH Style from MISS_HIT](https://misshit.org/). Specifically used the following code in the root directory for this repository: `mh_style . --fix`
+- Updated some variable names and replaced use of `obj` with `self` in objects to align better with the [PEP-8 style guide](https://www.python.org/dev/peps/pep-0008). Due to other repositories' dependency on `em-model-manned-bayes`, it is nontrivial to fully update `em-model-manned-bayes` to be analogously PEP-8 compliant.
 
 ### Removed
 
-- Property validation functions no longer use `mustBeVector`, whic was introduced in 2020b and limits tech transfer
+- Property validation functions no longer use `mustBeVector`, which was introduced in 2020b and limits tech transfer
 
 ### Fixed
 
@@ -94,7 +98,7 @@ and this project should adhere to [Semantic Versioning](https://semver.org/spec/
 
 - Grammar in README
 
-## [1.2.0] - 2020-09-24
+## [1.2] - 2020-09-24
 
 ### Added
 
@@ -121,6 +125,8 @@ and this project should adhere to [Semantic Versioning](https://semver.org/spec/
 
 - Initial public release
 
+[2.1.0]: https://github.com/Airspace-Encounter-Models/em-model-manned-bayes/releases/tag/v2.1.0
+[2.0.0]: https://github.com/Airspace-Encounter-Models/em-model-manned-bayes/releases/tag/v2.0.0
 [1.4.0]: https://github.com/Airspace-Encounter-Models/em-model-manned-bayes/releases/tag/v1.4
 [1.3.0]: https://github.com/Airspace-Encounter-Models/em-model-manned-bayes/releases/tag/v1.3
 [1.2.0]: https://github.com/Airspace-Encounter-Models/em-model-manned-bayes/releases/tag/v1.2

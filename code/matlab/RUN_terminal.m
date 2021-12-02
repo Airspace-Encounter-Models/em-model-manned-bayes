@@ -3,39 +3,43 @@
 
 %% Inputs
 % Data source
-srcData = 'terminalradar';
+src_data = 'terminalradar';
 
 % Number of total tracks
-nSamples = 18;
+n_samples = 18;
 
 % Random seed
-initialSeed = 1;
+init_seed = 1;
 
 % Aircraft type 1 used to set dynamic limits when rejection sampling
-acType1 = 'RTCA228_A1';
+ac_type1 = 'RTCA228_A1';
 
 %% Instantiate object
-mdl = CorTerminalModel('srcData',srcData);
+mdl = CorTerminalModel('srcData', src_data);
 
 %% Demonstrate how to update aircraft type
 % This is used to set dynamic limits of aircraft when rejection sampling to
 % create encounters
-fprintf('The default minimum velocity for %s aircraft 1 is %0.2f feet per second\n',mdl.acType1,mdl.dynLimits1.minVel_ft_s);
-mdl.acType1 = acType1;
-fprintf('The minimum velocity for %s aircraft 1 is %0.2f feet per second\n',mdl.acType1,mdl.dynLimits1.minVel_ft_s);
+fprintf('The default minimum velocity for %s aircraft 1 is %0.2f feet per second\n', mdl.acType1, mdl.dynLimits1.minVel_ft_s);
+mdl.acType1 = ac_type1;
+fprintf('The minimum velocity for %s aircraft 1 is %0.2f feet per second\n', mdl.acType1, mdl.dynLimits1.minVel_ft_s);
 
 %% Create set of start distributions
-startCells = mdl.InitStartTerminal('nSamples',nSamples);
+starts = mdl.InitStartTerminal('nSamples', n_samples, ...
+                               'own_intent', [true true], ...
+                               'int_intent', [true true true], ...
+                               'airspace_class', [false true true true]);
 
 %% Iterate over start distributions
-for ii=1:1:size(startCells,1)
+for ii = 1:1:size(starts, 1)
     % Set start distribution
-    mdl.start = startCells(ii,:);
-    
+    mdl.start = starts(ii, :);
+
     % Demonstrate how to generate samples
-    [outInits, outSamples] = mdl.sample(100,'seed',initialSeed);
-    mdl.plotSamplesGeo(outSamples);
-    
+    [out_inits, out_samples] = mdl.sample(500, 'seed', init_seed);
+    mdl.plotSamplesGeo(out_samples);
+
     % Demonstrate how to create an encounter with tracks
-    [outResults, genTime_s] = mdl.track(1,'firstID',ii,'initialSeed',initialSeed,'isPlot',true);
+    [out_results, gen_time_s] = ...
+        mdl.track(1, 'firstID', ii, 'initialSeed', init_seed, 'isPlot', true);
 end
