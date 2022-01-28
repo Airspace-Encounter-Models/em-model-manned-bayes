@@ -278,7 +278,8 @@ classdef UncorEncounterModel < EncounterModel
 
                 % Reorder to [t dh dpsi dv] to order that EncounterModelEvents (EME) expects
                 % As of July 2021, for the uncorrelated models, idxEME = [3 4 2]
-                idxEME = [idxDH, idxDPsi, idxDV] - size(controls, 2) + 1;
+                % idxEME = [idxDH, idxDPsi, idxDV] - size(controls, 2) + 1;
+                idxEME = [find(s.temporal_map(:, 1) == idxDH), find(s.temporal_map(:, 1) == idxDPsi), find(s.temporal_map(:, 1) == idxDV)] + 1;
                 controls = controls(:, [1 idxEME]);
 
                 % Convert to units used by EncounterModelEvents
@@ -382,6 +383,13 @@ classdef UncorEncounterModel < EncounterModel
             % Some rejection sampling thresholds
             min_alt_ft = min(self.boundaries{idx_L}); % ft
             max_alt_ft = max(self.boundaries{idx_L}); % ft
+
+            if isempty(min_alt_ft)
+                min_alt_ft = 0;
+            end
+            if isempty(max_alt_ft)
+                max_alt_ft = inf;
+            end
 
             % Other dynamic thresholds
             min_DH_ft_s = min(self.boundaries{idx_DH}) / 60; % hdot: ft/min -> ft/s

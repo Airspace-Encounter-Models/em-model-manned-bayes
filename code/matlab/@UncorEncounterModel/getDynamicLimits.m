@@ -10,8 +10,11 @@ function dynamiclimits = getDynamicLimits(self, initial, results, idx_G, idx_A, 
     prct_low = 1;
     prct_high = 99;
 
+    % Logical if model has all expected variable indices
+    is_idx = ~any(isempty(idx_G) | isempty(idx_A) | isempty(idx_L) | isempty(idx_V) | isempty(idx_DH));
+
     %% Do something if variables are in expected order
-    if idx_G == 1 && idx_A == 2 && idx_L == 3 && idx_V == 4 && idx_DH == 6
+    if is_idx && (idx_G == 1 && idx_A == 2 && idx_L == 3 && idx_V == 4 && idx_DH == 6)
 
         % Geographic domain
         if is_discretized(idx_G)
