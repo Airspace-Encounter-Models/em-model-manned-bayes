@@ -39,10 +39,6 @@ function [initial, events] = dbn_sample(parms, dirichlet_initial, dirichlet_tran
     dynamic_variables = temporal_map(:, 2);
     x = [initial zeros(1, numel(dynamic_variables))];
 
-    % events
-    events = nan(n_initial * t_max, numel(dynamic_variables));
-    counter = 0;
-
     % Time between different events
     delta_t = 0;
 
@@ -53,69 +49,118 @@ function [initial, events] = dbn_sample(parms, dirichlet_initial, dirichlet_tran
         ia = ia';
     end
 
-    %% Calculate index for variables
-    % We calculate index, j, upfront because asub2ind() can
-    % introduce unwanted overhead
-    j = nan(size(order_transition));
-    % N_trans_dyn = cell(size(order_transition));
-    % dirichlet_trans_dyn = cell(size(order_transition));
+    % Determine if any of the dynamic variables depend on another dynamic
+    % variable. This determines if we can calculate the index, j, upfront
+    % or via each iterate of t
+    is_dynvar_depend = any(G_transition(dynamic_variables, dynamic_variables), 'all');
 
-    s = cell(size(order_transition));
-    sthres = zeros(t_max, numel(order_transition));
-
-    for ii = order_transition
-        if any(ii == dynamic_variables)
-            % only dynamic variables change
-            parents = G_transition(:, ii);
-            if any(parents)
-                rj = r_transition(parents);
-                xj = x(parents);
-                j(ii) = asub2ind(rj, xj);
-            else
-                j(ii) = 1;
-            end
-
-            % Parse N_transition and dirichlet_transition for each dyn variable
-            N_trans_dyn = N_transition{ii}(:, j(ii));
-            dirichlet_trans_dyn = dirichlet_transition{ii}(:, j(ii));
-
-            % Combine transition and dirichlet for weights
-            weights = N_trans_dyn + dirichlet_trans_dyn;
-
-            % Calculate cumsum of weights
-            s{ii} = cumsum(weights);
-
-            % Calculate random threshold
-            sthres(:, ii) = s{ii}(end) * rand(t_max, 1);
-        end
+    % events
+    if is_dynvar_depend
+        events = [];
+    else
+        events = nan(n_initial * t_max, numel(dynamic_variables));
     end
 
     %% Iterate
-    for t = 2:t_max
-        delta_t = delta_t + 1;
-        x_old = x;
+    if is_dynvar_depend
+        for t = 2:t_max
+            delta_t = delta_t + 1;
+            x_old = x;
+            for i = order_transition
+                if any(i == dynamic_variables)
+                    % only dynamic variables change
+                    parents = G_transition(:, i);
+                    j = 1;
+                    if any(parents)
+                        j = asub2ind(r_transition(parents), x(parents));
+                    end
+                    x(i) = select_random(N_transition{i}(:, j) + dirichlet_transition{i}(:, j));
+                end
+            end
 
-        % Iterate over dynamic variables to select random index
-        for ii = ia
-            x(ii) = find(s{ii} >= sthres(t, ii), 1, 'first');
-            % x(i) = select_random(weights);
-        end
+            % map back
+            x(temporal_map(:, 1)) = x(temporal_map(:, 2));
 
-        % map back
-        x(temporal_map(:, 1)) = x(temporal_map(:, 2));
-
-        if any(x(1:n_initial) ~= x_old(1:n_initial))
-            % change (i.e. new event)
-            for ii = 1:n_initial
-                if x(ii) ~= x_old(ii)
-                    counter = counter + 1;
-                    events(counter, :) = [delta_t, ii, x(ii)];
-                    % events = [events; delta_t, i, x(i)]; % Deprecated
-                    delta_t = 0;
+            if any(x(1:n_initial) ~= x_old(1:n_initial))
+                % change (i.e. new event)
+                for i = 1:n_initial
+                    if x(i) ~= x_old(i)
+                        events = [events; delta_t i x(i)];
+                        delta_t = 0;
+                    end
                 end
             end
         end
-    end
 
-    % Remove unused prelloacate rows
-    events = events(1:counter, :);
+    else
+
+        % Calculate index for variables
+        % We calculate index, j, upfront because asub2ind() can
+        % introduce unwanted overhead
+        j = nan(size(order_transition));
+        % N_trans_dyn = cell(size(order_transition));
+        % dirichlet_trans_dyn = cell(size(order_transition));
+
+        s = cell(size(order_transition));
+        sthres = zeros(t_max, numel(order_transition));
+
+        % Counter for events matrix
+        counter = 0;
+
+        for ii = order_transition
+            if any(ii == dynamic_variables)
+                % only dynamic variables change
+                parents = G_transition(:, ii);
+                if any(parents)
+                    rj = r_transition(parents);
+                    xj = x(parents);
+                    j(ii) = asub2ind(rj, xj);
+                else
+                    j(ii) = 1;
+                end
+
+                % Parse N_transition and dirichlet_transition for each dyn variable
+                N_trans_dyn = N_transition{ii}(:, j(ii));
+                dirichlet_trans_dyn = dirichlet_transition{ii}(:, j(ii));
+
+                % Combine transition and dirichlet for weights
+                weights = N_trans_dyn + dirichlet_trans_dyn;
+
+                % Calculate cumsum of weights
+                s{ii} = cumsum(weights);
+
+                % Calculate random threshold
+                sthres(:, ii) = s{ii}(end) * rand(t_max, 1);
+            end
+        end
+
+        % Iterate
+        for t = 2:t_max
+            delta_t = delta_t + 1;
+            x_old = x;
+
+            % Iterate over dynamic variables to select random index
+            for ii = ia
+                x(ii) = find(s{ii} >= sthres(t, ii), 1, 'first');
+                % x(i) = select_random(weights);
+            end
+
+            % map back
+            x(temporal_map(:, 1)) = x(temporal_map(:, 2));
+
+            if any(x(1:n_initial) ~= x_old(1:n_initial))
+                % change (i.e. new event)
+                for ii = 1:n_initial
+                    if x(ii) ~= x_old(ii)
+                        counter = counter + 1;
+                        events(counter, :) = [delta_t, ii, x(ii)];
+                        % events = [events; delta_t, i, x(i)]; % Deprecated
+                        delta_t = 0;
+                    end
+                end
+            end
+        end
+
+        % Remove unused prelloacate rows
+        events = events(1:counter, :);
+    end

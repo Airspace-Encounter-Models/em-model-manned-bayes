@@ -318,11 +318,13 @@ classdef EncounterModel < handle
         end
 
         function value = get.cutpoints_transition(self)
-            value = [self.cutpoints_initial, self.cutpoints_initial(end - 2:end)];
+            is_dot = contains(self.labels_initial,"\dot");
+            value = [self.cutpoints_initial, self.cutpoints_initial(is_dot)];
         end
 
         function value = get.bounds_transition(self)
-            value = [self.bounds_initial; self.bounds_initial(end - 2:end, :)]; % repeat bounds for last 3 vars in initial
+            is_dot = contains(self.labels_initial,"\dot");
+            value = [self.bounds_initial; self.bounds_initial(is_dot, :)]; % repeat bounds for last 3 vars in initial
         end
 
         function value = get.dediscretize_parameters(self)
