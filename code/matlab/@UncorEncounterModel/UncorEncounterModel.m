@@ -41,7 +41,11 @@ classdef UncorEncounterModel < EncounterModel
                 parameters_filename = p.Results.parameters_filename;
             end
 
-            %
+            if contains(parameters_filename,["balloon_v1.txt", "weatherballoon_v1.txt"])
+                warning('dynvar:mdl',...
+                    'Unconventional balloon models do not have dynamic variables for acceleration and turn rate. Models will not work with sample and track class methods.'); 
+            end
+            
             switch p.Results.input_type
                 case 'traditional-opensky'
                     labels_initial = {'G' 'A' 'L' 'v' '\dot v' '\dot h' '\dot \psi'};
@@ -224,6 +228,11 @@ classdef UncorEncounterModel < EncounterModel
             idxDH = find(strcmp(self.labels_initial, '"\dot h"'));
             idxDPsi = find(strcmp(self.labels_initial, '"\dot \psi"'));
 
+            if isempty(idxDV) | isempty(idxDH) | isempty(idxDPsi)
+                error('dynvar:empty',...
+                    'Model does not have a dynamic variable for either acceleration, vertical rate, or turn rate');
+            end
+            
             % Convert object to struct
             % There is a class method to do this, as casting via struct(obj)
             % should be avoided (ref MATLAB documentation)
@@ -363,6 +372,9 @@ classdef UncorEncounterModel < EncounterModel
             % Preallocate output
             out_results = cell(nSamples, 1);
 
+            % Default parsed digitial obstacle file (DOF) from em-core
+            file_dof = [getenv('AEM_DIR_CORE') filesep 'output' filesep 'dof.mat'];
+            
             % Initial 2D position
             % Vertical axis set in for loop based on model sample
             n_ft = 0;
@@ -468,12 +480,19 @@ classdef UncorEncounterModel < EncounterModel
                     case 'neu'
                         out_results{ii} = TT;
                     case 'geodetic'
-
+                        
+                        % Check if dof.mat exists
+                        is_file_dof = exist(file_dof,'file');
+                        if is_file_dof == 0
+                            warning('track:nodoffile',...
+                            'Parsed digitial obstacle file (DOF) not found check em-core to generate dof.mat')
+                        end
+                        
                         % Filter DOF based on bounding box of anchor points
-                        if any(strcmpi(p.UsingDefaults, 'Tdof'))
+                        if any(strcmpi(p.UsingDefaults, 'Tdof')) && is_file_dof
                             [latc_deg, lonc_deg] = scircle1(lat0_deg, lon0_deg, 182283, [], wgs84Ellipsoid('ft'));
                             bbox = [min(lonc_deg), min(latc_deg); max(lonc_deg), max(latc_deg)];
-                            [~, Tdof] = gridDOF('inFile', [getenv('AEM_DIR_CORE') filesep 'output' filesep 'dof.mat'], ...
+                            [~, Tdof] = gridDOF('inFile', file_dof, ...
                                                 'BoundingBox_wgs84', bbox, ...
                                                 'minHeight_ft', dofMinHeight_ft, ...
                                                 'isVerified', true, ...
@@ -481,18 +500,27 @@ classdef UncorEncounterModel < EncounterModel
                         else
                             Tdof = p.Results.Tdof;
                         end
-
-                        % Create obstacles polygons
-                        spheroid_ft = wgs84Ellipsoid('ft');
-                        [lat_obstacle_deg, lon_obstacle_deg] = scircle1(Tdof.lat_deg, Tdof.lon_deg, repmat(dofMaxRange_ft, size(Tdof, 1), 1), [], spheroid_ft, 'degrees', 20);
-                        alt_obstacle_ft_agl = Tdof.alt_ft_agl + dofMaxVert_ft;
-
-                        % Translate to geodetic using placeTrack
+                        
+                        % Arguments for placeTrack
                         args = {'labelTime', 'Time', 'labelX', 'east_ft', 'labelY', 'north_ft', 'labelZ', 'up_ft', ...
                                 'z_agl_tol_ft', z_agl_tol_ft, 'z_units', 'agl', ...
-                                'latObstacle', lat_obstacle_deg, 'lonObstacle', lon_obstacle_deg, 'altObstacle_ft_agl', alt_obstacle_ft_agl, ...
                                 'Z_m', Z_m, 'refvec', refvec, 'R', R, ...
                                 'isPlot', isPlot, 'seed', seed};
+
+                        % Create obstacles polygons
+                        % Add obstacles to args for placeTrack
+                        if ~isempty(Tdof)
+                             spheroid_ft = wgs84Ellipsoid('ft');
+                            [lat_obstacle_deg, lon_obstacle_deg] = scircle1(Tdof.lat_deg, Tdof.lon_deg, repmat(dofMaxRange_ft, size(Tdof, 1), 1), [], spheroid_ft, 'degrees', 20);
+                            alt_obstacle_ft_agl = Tdof.alt_ft_agl + dofMaxVert_ft;
+                            
+                            args = [args, ...
+                                {'latObstacle'}, {lat_obstacle_deg},...
+                                {'lonObstacle'}, {lon_obstacle_deg},...
+                                {'altObstacle_ft_agl'}, {alt_obstacle_ft_agl}];
+                        end
+                        
+                        % Translate to geodetic using placeTrack 
                         outTrack = placeTrack(TT, lat0_deg, lon0_deg, args{:});
 
                         % Assign

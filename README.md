@@ -12,6 +12,7 @@ Each manned aircraft model is a set of Bayesian Networks, a representation of a 
     - [Persistent System Environment Variable](#persistent-system-environment-variable)
     - [em-core](#em-core)
   - [Run Order](#run-order)
+    - [Startup script](#startup-script)
     - [Classes (Object-Oriented Programming)](#classes-object-oriented-programming)
     - [Run Scripts](#run-scripts)
   - [Datafiles and Documentation](#datafiles-and-documentation)
@@ -74,6 +75,10 @@ Clone [`em-core`](https://github.com/Airspace-Encounter-Models/em-core). Confirm
 ## Run Order
 
 This section describes main object-oriented programming (OOP) classes and example run scripts.
+
+### Startup script
+
+When first launching MATLAB, please run the startup script, `start_bayes`, to set the path and other configurations.
 
 ### Classes (Object-Oriented Programming)
 
@@ -169,7 +174,7 @@ This model includes only one Bayesian network.
 
 Filename | Model | Description (Version) | Altitude Scope
 :---  | :---  | :---  | :---:  
-[dueregard-v1p0.txt](./model/dueregard-v1p0.txt) | [due regard](https://github.com/Airspace-Encounter-Models/em-overview/blob/master/README.md#manned-due-regard) | Aircraft participating in the ETMS (v1.0) | (0, Inf]
+[dueregard_v1.txt](./model/dueregard_v1.txt) | [due regard](https://github.com/Airspace-Encounter-Models/em-overview/blob/master/README.md#manned-due-regard) | Aircraft participating in the ETMS (v1.0) | (0, Inf]
 
 ### DFDR-Based Helicopter Air Ambulance Model
 

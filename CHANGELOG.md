@@ -13,20 +13,29 @@ and this project should adhere to [Semantic Versioning](https://semver.org/spec/
 
 ### Changed
 
+- Updated `UncorEncounterModel` and dependent functions to support most unconventional models and the due regard model. Functionality requested by and partly tested by @Wh0DKnee
+- Improved documentation and instructions in `RUN_uncor` script
 - Check for MATLAB version in `startup_bayes` and mapping toolbox in `UncorEncounterModel` constructor. These updates are in response to when creating geodetic tracks with `UncorEncounterModel/track`, as `readgeoraster` is called as within `msl2agl`.  `readgeoraster` was introduced as part of the MATLAB mapping toolbox in 2020a.
 - Style fixes for entire repository using [MH Style from MISS_HIT](https://misshit.org/). Specifically used the following code in the root directory for this repository: `mh_style . --fix`
 - Updated some variable names and replaced use of `obj` with `self` in objects to align better with the [PEP-8 style guide](https://www.python.org/dev/peps/pep-0008). Due to other repositories' dependency on `em-model-manned-bayes`, it is nontrivial to fully update `em-model-manned-bayes` to be analogously PEP-8 compliant.
+- Updated and streamlined unconventional model parameter files based on MIT Lincoln Laboratory Report ATC-348
+- Updated and renamed due regard model parameter file to use naming convention as the parameter files and based on MIT Lincoln Laboratory Report ATC-397
+- Update .gitattributes to enforce `eol=LF` for .txt files
 
 ### Removed
 
 - Property validation functions no longer use `mustBeVector`, which was introduced in 2020b and limits tech transfer
+- Removed unconventional models with v1p2 suffix
 
 ### Fixed
 
 - Updates `dbn_sample` to use previous implementation if a dynamic variable depends on another dynamic variable. In release [1.4.0] `dbn_sample` was updated to calculate the index, `j`, upfront because `asub2ind` can introduce unwanted overhead and also preallocated events as a NaN array. In this previous release, the `for ii = order_transition` loop was added to identify the relationship between dynamic variables and its parents. Notably in the for `ii = order_transition` loop, the variable `x` was not updated. Now this is where the bug was introduced. If a dynamic variable was dependent on another dynamic variable (see unconventional glider model), `xj = x(parents)` would be equal for the element with the dynamic variable dependence. This would results in `asub2ind(rj, xj)` returning a negative value, which would create an error when indexing `N_transition{ii}(:, j(ii))`. Since the uncorrelated conventional models transition networks do not have any dynamic variables not dependent on another dynamic variable, this bug was not identified in release [1.4.0]. For this release, the bug was addressed by determining if any of the dynamic variables depend on another dynamic variable. This determines if we can calculate the index, `j`, upfront or via each iterate of `t`. If there is a dependence, it will sample the model similar to Release [1.3.0] where the events matrix was also preallocated as an empty array
 - Update `UncorEncounterModel/getDynamicLimits` to check that variable indices (i.e. `idx_G`, `idx_A`, etc.) are not empty. Currently this check will only pass for model structures as the uncorrelated conventional aircraft models; the unconventional models currently all lack geographic domain (G) and will not pass this check. Without this check an error would throw when trying to use a logical operator on an empty variable.
 - Update how `UncorEncounterModel/sample` calculates the order of variables when reorganizing the controls matrix. The model's temporal matrix is used explicitly instead of trying to infer the order from the controls matrix
-- Update `UncorEncounterModel/sample` to ensure that the altitude minimum (`min_alt_ft`) and maximum (`max_alt_ft`) are not empty. They can be empty if the model structure does not have boundaries defined for altitude layer, L
+- Update `UncorEncounterModel/sample` to ensure that the altitude minimum (`min_alt_ft`) and maximum (`max_alt_ft`) are not empty. They can be empty if the model structure does not have altitude layer, L, as a variable
+- Fixed bug in `UncorEncounterModel` when dof.mat from em-core did not exist by checking if dot.mat actually exists
+- Update `EncounterModel` getters for cutpoints_transition and bounds_transition to not assume a specific order of variables. Getters now create returned valued based on the model's label_initial
+- README now instructs user to run startup script, `startup_bayes`. Bug first identified by @lydiaZeleke
 
 ## [2.1.0] - 2021-10-01
 
