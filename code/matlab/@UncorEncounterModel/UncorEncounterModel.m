@@ -443,8 +443,8 @@ classdef UncorEncounterModel < EncounterModel
                     bank_rad = atan(v_ft_s * dpsi_rad_s / 32.2); % 32.2 = acceleration g
 
                     % Initial conditions array for run_dynamics_fast
-                    ic = [0, v_ft_s, n_ft, e_ft, h_ft, heading_rad, pitch_rad, bank_rad, dv_ft_ss];
-
+                    ic = [v_ft_s, n_ft, e_ft, h_ft, heading_rad, pitch_rad, bank_rad, dv_ft_ss];
+                    
                     % Simulate track using run_dynamics_fast
                     results = run_dynamics_fast(ic, controls, dyn, ic, controls, dyn, sample_time);
                     results = results(1);
