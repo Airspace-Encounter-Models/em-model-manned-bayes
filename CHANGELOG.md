@@ -36,6 +36,7 @@ and this project should adhere to [Semantic Versioning](https://semver.org/spec/
 - Fixed bug in `UncorEncounterModel` when dof.mat from em-core did not exist by checking if dot.mat actually exists
 - Update `EncounterModel` getters for cutpoints_transition and bounds_transition to not assume a specific order of variables. Getters now create returned valued based on the model's label_initial
 - README now instructs user to run startup script, `startup_bayes`. Bug first identified by @lydiaZeleke
+- Update `bn_sample` to check that `ith` element in `start` is not empty (`~isempty`) nor a NaN (`~isnan`). Bug first identified and resolved by @hooveranna 
 
 ## [2.1.0] - 2021-10-01
 
