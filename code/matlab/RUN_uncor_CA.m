@@ -10,13 +10,13 @@
 % ICAO Classifcation table can be found here: https://www.icao.int/publications/DOC8643/Pages/Search.aspx 
 
 %% Startup script
-    file_startup = [getenv('AEM_DIR_BAYES') filesep 'startup_bayes.m'];
+file_startup = [getenv('AEM_DIR_BAYES') filesep 'startup_bayes.m'];
 run(file_startup);
 
 %% Inputs
 
 % Read Canadian model parameter file
-parameters_filename = [getenv('CANADIAN_MODELS') filesep 'Helicopter_Below_10000_ft_Data.mat'];
+parameters_filename = [getenv('CANADIAN_MODELS') filesep 'Light_Aircraft_Below_10000_ft_Data.mat'];
 
 % Number of sample / tracks
 n_samples = 20;
@@ -37,19 +37,3 @@ mdl = UncorEncounterModel_CA('parameters_filename', parameters_filename);
 %% Demonstrate how to generate tracks
 % Local relative Cartesian coordinate system
 out_results_NEU = mdl.track(n_samples, sample_time, 'initialSeed', init_seed, 'coordSys', 'NEU');
-
-%% Plot created tracks
-
-for i=1:sample_time
-    figure();
-    tiledlayout(2,1);
-    grid on;
-    nexttile;
-    plot(out_results_NEU{i,1}{:,1}, out_results_NEU{i,1}{:,2});
-    nexttile;
-    plot(out_results_NEU{i,1}{:,3});
-    
-    pause(1);
-
-end
-

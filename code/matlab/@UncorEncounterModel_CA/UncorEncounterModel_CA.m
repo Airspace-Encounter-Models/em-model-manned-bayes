@@ -1,17 +1,10 @@
-classdef UncorEncounterModel_CA < EncounterModel_CA
+classdef UncorEncounterModel_CA < EncounterModel_CA & UncorEncounterModel & EncounterModel
     % Copyright 2008 - 2021, MIT Lincoln Laboratory
     % Copyright 2023 Carleton University and National Research Council of
     % Canada
     % SPDX-License-Identifier: BSD-2-Clause
 
-    properties (SetAccess = public, GetAccess = public)
-        isRotorcraft(:, :) logical {mustBeNumericOrLogical, mustBeNonnegative, mustBeFinite}
-    end
-
-    properties (Dependent = true)
-        variables2controls
-    end
-
+    
     %% Constructor Function
     methods
 

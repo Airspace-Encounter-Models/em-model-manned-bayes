@@ -2,7 +2,7 @@ classdef EncounterModel < handle
     % Copyright 2008 - 2021, MIT Lincoln Laboratory
     % SPDX-License-Identifier: BSD-2-Clause
     %%
-    properties (SetAccess = immutable, GetAccess = public)
+    properties (SetAccess = protected, GetAccess = public)
         % Variable labels
         labels_initial(1, :) cell
         labels_transition(1, :) cell
