@@ -7,6 +7,7 @@
 File | Description |
 :--- | :--- |
 [RUN_uncor.m](RUN_uncor.m) | Samples and creates tracks from an uncorrelated encounter model using the `UncorEncounterModel` class
+[RUN_uncor_CA.m](RUN_uncor_CA.m) | Samples and creates tracks from Canadian encounter model using the `UncorEncounterModel_CA` class
 [RUN_terminal.m](RUN_terminal.m) | Samples and creates encounters from the correlated terminal encounter model using the `CorTerminalModel` class
 
 ### Function specific
