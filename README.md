@@ -68,6 +68,16 @@ export AEM_DIR_BAYES=PATH TO /em-model-manned-bayes
 
 You can confirm `AEM_DIR_BAYES` was set in unix by inspecting the output of `env`.
 
+
+If you would like to create synthetic tracks from Canadian data, you would need to clone [`Canadian Airspace Models`](https://github.com/nrc-cnrc/Canadian-Airspace-Models).
+After cloning, [create a persistent system environment](https://superuser.com/q/284342/44051) variable titled `CANADIAN_MODELS` with a value of the full path to /Canadian-Airspace-Models/Matlab_Frequency_Tables.
+
+```bash
+export CANADIAN_MODELS=PATH TO /Canadian-Airspace-Models/Matlab_Frequency_Tables
+```
+
+You can confirm `CANADIAN_MODELS` was set in unix by inspecting the output of `env`.
+
 ### em-core
 
 Clone [`em-core`](https://github.com/Airspace-Encounter-Models/em-core). Confirm that the system environment variable `AEM_DIR_CORE` has been set, as instructed by its [README](https://github.com/Airspace-Encounter-Models/em-core/blob/master/README.md#persistent-system-environment-variable). Please confirm you have compiled the mex function, `run_dynamics_fast`.
@@ -82,7 +92,7 @@ When first launching MATLAB, please run the startup script, `start_bayes`, to se
 
 ### Classes (Object-Oriented Programming)
 
-The latest release introduces object oriented programming with the addition of the `EncounterModel` superclass, `UncorEncounterModel` class, and `CorTerminalModel` class. These classes enable the user to easily read in the ASCII parameter files with improved input handling. Classes are not yet available for the RADES-based correlated, ETMS-based due regard, DFDR-based HAA, and most unconventional models.
+The latest release introduces object oriented programming with the addition of the `EncounterModel` and `EncounterModel_CA` superclasses, `UncorEncounterModel`,`UncorEncounterModel_CA`and`CorTerminalModel` classes. These classes enable the user to easily read in the MIT ASCII parameter files as well as Canadian .mat files with improved input handling. Classes are not yet available for the RADES-based correlated, ETMS-based due regard, DFDR-based HAA, and most unconventional models.
 
 ### Run Scripts
 
