@@ -86,7 +86,7 @@ The latest release introduces object oriented programming with the addition of t
 
 ### Run Scripts
 
-The run script, [`RUN_uncor`](./code/matlab/RUN_uncor.m), demonstrates how using `UncorEncounterModel` can sample the uncorrelated encounter model or generate local Cartesian or geodetic uncorrelated tracks with a few lines of code. A similar run script, [`RUN_terminal`](./code/matlab/RUN_terminal.m) demonstrates the basic functionality of the correlated terminal encounter model.
+The run script, [`RUN_uncor`](./code/matlab/RUN_uncor.m), demonstrates how using `UncorEncounterModel` can sample the uncorrelated encounter model or generate local Cartesian or geodetic uncorrelated tracks with a few lines of code. A similar run script, [`RUN_terminal`](./code/matlab/RUN_terminal.m) demonstrates the basic functionality of the correlated terminal encounter model. The run script, [`RUN_uncor_CA`](./code/matlab/RUN_uncor_CA.m), demonstrates how using `UncorEncounterModel_CA` can sample and create tracks from the Canadian encounter model. 
 
 ## Datafiles and Documentation
 
