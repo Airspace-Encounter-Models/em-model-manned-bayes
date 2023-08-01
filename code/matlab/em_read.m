@@ -1,5 +1,5 @@
 function parms = em_read(parameters_filename, varargin)
-    % Copyright 2008 - 2021, MIT Lincoln Laboratory
+    % Copyright 2008 - 2023, MIT Lincoln Laboratory
     % SPDX-License-Identifier: BSD-2-Clause
     % EM_READ  Reads an encounter model parameters file.
     % Reads an encounter model parameters file and returns a struct
@@ -55,6 +55,7 @@ function parms = em_read(parameters_filename, varargin)
     idxField = find(isField == true);
     fields = textMaster(isField);
     numFields = nnz(isField);
+    numRows = size(textMaster, 1);
 
     % Check if labels_initial is the first field
     if ~strcmp(fields(1), "# labels_initial")
@@ -68,6 +69,7 @@ function parms = em_read(parameters_filename, varargin)
         switch fields(ii)
             case '# labels_initial'
                 parms.labels_initial = strtrim(strsplit(textMaster{row}, ','));
+                parms.labels_initial = strrep(parms.labels_initial,'"','');
                 parms.n_initial = numel(parms.labels_initial);
             case '# G_initial'
                 parms.G_initial = logical(scanmatrix(textMaster, row, parms.n_initial));
@@ -81,6 +83,7 @@ function parms = em_read(parameters_filename, varargin)
                 parms.N_initial = array2cells(x{1}, dims_initial);
             case  '# labels_transition'
                 parms.labels_transition = strtrim(strsplit(textMaster{row}, ','));
+                parms.labels_transition = strrep(parms.labels_transition,'"','');
                 parms.n_transition = numel(parms.labels_transition);
             case '# G_transition'
                 parms.G_transition = logical(scanmatrix(textMaster, row, parms.n_transition));
@@ -99,8 +102,14 @@ function parms = em_read(parameters_filename, varargin)
                     parms.boundaries{jj} = x{1};
                 end
             case '# resample_rates'
+                if row <= numRows
                 x = textscan(textMaster{row}, '%f', 'Delimiter', ' ');
                 parms.resample_rates = x{1};
+                else
+                    warning('em_read:row:greaterthan:numRows',...
+                        'No data on row %i, setting resample_rates to zeros', row);
+                    parms.resample_rates = zeros(size(parms.labels_initial)); 
+                end
             otherwise
                 error('Unknown field: %s', fields(ii));
         end

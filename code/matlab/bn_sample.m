@@ -1,5 +1,5 @@
 function S = bn_sample(G, r, N, alpha, num_samples, start, order)
-    % Copyright 2008 - 2021, MIT Lincoln Laboratory
+    % Copyright 2008 - 2022, MIT Lincoln Laboratory
     % SPDX-License-Identifier: BSD-2-Clause
     % BN_SAMPLE Produces a sample from a Bayesian network.
     %   Returns a matrix whose rows consist of n-dimensional samples from the
@@ -42,7 +42,7 @@ function S = bn_sample(G, r, N, alpha, num_samples, start, order)
             parents = G(:, i);
             j = 1;
 
-            if ~isempty(start{i})
+            if ~isempty(start{i}) & ~isnan(start{i})
                 if any(parents) && length([start{parents > 0}]) < sum(parents)
                     error('Attempt to preset a dependent variable');
                 else
