@@ -12,14 +12,14 @@ function [traj] = createEncounter(self, sample_geo, tmax_s)
     %% Assign models
     % Assign ownship trajectory model (AC1)
     switch sample_geo.own_intent
-        case 1
-            mdl_fwd1 = self.mdlFwd1_1;
-            mdl_bck1 = self.mdlBck1_1;
-        case 2
-            mdl_fwd1 = self.mdlFwd1_2;
-            mdl_bck1 = self.mdlFwd1_2;
-        otherwise
-            error('Unknown int_intent = %i', sample_geo.own_intent);
+    case 1
+        mdl_fwd1 = self.mdlFwd1_1;
+        mdl_bck1 = self.mdlBck1_1;
+    case 2
+        mdl_fwd1 = self.mdlFwd1_2;
+        mdl_bck1 = self.mdlBck1_2;
+    otherwise
+        error('Unknown int_intent = %i', sample_geo.own_intent);
     end
 
     % Assign intruder trajectory model (AC2)
@@ -29,10 +29,10 @@ function [traj] = createEncounter(self, sample_geo, tmax_s)
             mdl_bck2 = self.mdlBck2_1;
         case 2
             mdl_fwd2 = self.mdlFwd2_2;
-            mdl_bck2 = self.mdlFwd2_2;
+            mdl_bck2 = self.mdlBck2_2;
         case 3
             mdl_fwd2 = self.mdlFwd2_3;
-            mdl_bck2 = self.mdlFwd2_3;
+            mdl_bck2 = self.mdlBck2_3;
         otherwise
             error('Unknown int_intent = %i', sample_geo.int_intent);
     end
