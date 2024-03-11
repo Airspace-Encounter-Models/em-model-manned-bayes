@@ -31,6 +31,7 @@ File | Description |
 [bn_sort.m](bn_sort.m) | Produces a topological sort of a Bayesian network.
 [dbn_sample.m](dbn_sample.m) | Samples from a dynamic Bayesian network.
 [em_read.m](em_read.m)  | Reads an encounter model parameters file.
+[em_read_CAN.m](em_read_CAN.m)  | Reads a Canadian encounter model parameters file.
 [em_sample.m](em_sample.m) | Outputs samples from an encounter model to files.
 [IdentifyGeographicVariable](IdentifyGeographicVariable.m) | Identifies the geographic domain for latitude, longitude coordinates
 [select_random.m](select_random.m) | Randomly selects an index according to specified weights.
